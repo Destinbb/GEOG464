@@ -1,5 +1,7 @@
 # Montreal Bike Lanes
 
+[Link to the site](/site)
+
 ## The five sentences
 
 1. **Problem:** People commuting by bike in Montréal may not know what cycling infrastructure is available across the city, making it harder to understand the potential route options.
@@ -34,10 +36,12 @@ I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from D
 for A3 I added the Pavement Condition Index so my reader can see the condition of each potential bike route. 
 It has depth because it displays the pavement condition of specific roads in Montreal. 
 I will know it works when: I can turn on the pavement layer switcher and examine each road segment based on it's PCI rating. 
-Im not sure what my edge case is 
+My edge case is a bicycle route segment with no matching pavement condition record. Since the bicycle network and pavement condition datasets are separate sources joined using ID_TRC, not every bicycle route necessarily has corresponding pavement information. The bicycle route should remain visible on the map, and its route information should still be accessible through the popup. However, the pavement condition score and survey date should be identified as unavailable rather than displaying an incorrect value. This prevents users from interpreting missing pavement data as an indication of poor road conditions.
+
+
 # Tests
 Test 1: turn on the layer switcher for PCI in the wepages legend
 -Expected: PCI layer loads and displays the roads pavement condition rating 
 Test 2: I click a segment of road to view its pavement condition
 -Expected: the pop-up opens and displays the segments PCI score and rating 
-Test 3: My edge case is 
+Test 3: I'm going to test tye edge case by finding a segment that has no ID_TRC in the pavement dataset```
