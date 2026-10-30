@@ -29,3 +29,15 @@ How AI was used
 I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from Données Québec's open-data portal. I filtered the data to include only features where VILLE_MTL = Oui, removed features with missing geometry or required fields, counted exclusions, and translated selected property keys from French to English. I also used the agent to separate protected and unprotected bike routes. I reviewed the filtered data to verify that routes were within Montréal, the translations preserved the original meaning, and segments were correctly classified.
 
 # B5:
+
+# A3 feature: Pavement Condition Index
+for A3 I added the Pavement Condition Index so my reader can see the condition of each potential bike route. 
+It has depth because it displays the pavement condition of specific roads in Montreal. 
+I will know it works when: I can turn on the pavement layer switcher and examine each road segment based on it's PCI rating. 
+Im not sure what my edge case is 
+# Tests
+Test 1: turn on the layer switcher for PCI in the wepages legend
+-Expected: PCI layer loads and displays the roads pavement condition rating 
+Test 2: I click a segment of road to view its pavement condition
+-Expected: the pop-up opens and displays the segments PCI score and rating 
+Test 3: My edge case is 
