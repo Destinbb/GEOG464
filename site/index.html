@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Montreal Bicycle Network</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <main class="story">
+        <h1>Montreal: Bicycle Network</h1>
+        <p class="lede">Bicycle commuting offers a relatively low-cost, healthy and environmentally friendly alternative to motorized transportation. However, for people who are new to cycling or unfamiliar with Montreal, navigating the city's cycling infrastructure can be intimidating. Futhermore, protected bike routes that offer a phyiscal barrier between the bike lane and vehicle traffic can provide a safer commuting experience. Understanding where bike routes are located and which types of infrastructure they offer can help people make more informed decisions about their commute.</p>
+        <p><strong>This map is for:</strong> Cyclists in Montreal who may not be familiar with the city's bike-lane infrastructure.</p>
+        <p><strong>What you can do here:</strong> Compare protected and unprotected bike routes by toggling the visibility of each layer. Popup information for each segment explains its type, area, protection status, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
+        <section>
+        <h2>Not in this iteration</h2>  
+        <p>This map does not provide route planning, a or route safety rating as they are currently outside the scope of this MVP.</p>
+      </section>
+      <section> 
+        <h3>How AI was used</h3>
+        <p> I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from Données Québec's open-data portal. I used the agent to filter the scope of the data by only keeping features where VILLE_MTL = Oui. I also used the agent to remove features with missing geometry or required fields, count the exclusions and translate the selected property keys from French to English for the map. Finally I used the agent to split the data into protected and unprotected layers. I reviewed the filtered GeoJSON and made sure that only routes within the city limits and with required fields were displayed on the map. I also checked that the English translations preserved the meaning of the original values. Finally, I confirmed that all segments were correctly classified into the protected and unprotected layers, and were displayed correctly on the map. I also tested the page by toggling the visibility of each layer and opening the popups to ensure they displayed the feature information.</p>
+      </section>
+      <section>
+        <h2>Montreal Bicycle Network </h2>
+        <ul>
+          <li>
+            <a href="https://www.donneesquebec.ca/recherche/dataset/vmtl-pistes-cyclables">Réseau cyclable</a>,
+              City of Montréal, licensed under
+            <a href="https://www.donneesquebec.ca/licence/#cc-by">CC BY 4.0</a>.
+            Accessed October 1, 2026. For this MVP, I kept features marked as being
+            within the City of Montréal, removed records with missing geometry or
+            required fields, and kept the geometry plus selected properties. I renamed
+            those property keys in English but the source values themselves remain unchanged.
+          </li>
+       </ul>
+        
+
+
+      </section>
+        <p id="status">Loading bike-lane data...</p>
+      </main>
+      <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
