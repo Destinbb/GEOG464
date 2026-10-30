@@ -166,6 +166,30 @@ Promise.all([
         data.features.length + ' bike-lane segments shown: ' +
         protectedCount + ' protected, ' + otherCount + ' other';
     }
+
+    // Search: lower-case, drop accents and treat – like - so "montreal-nord" finds "Montréal-Nord"
+    function normalise(text) {
+      return (text || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[–—]/g, '-').toLowerCase().trim();
+    }
+
+    document.getElementById('search-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      const typed = document.getElementById('search-input').value;
+      const query = normalise(typed);
+      const matches = protectedLayer.getLayers().filter(function (layer) {
+        return query && normalise(layer.feature.properties.area).includes(query);
+      });
+
+      if (matches.length === 0) {
+        status.textContent = 'No protected routes found for "' + typed + '".';
+        return;
+      }
+      if (!map.hasLayer(protectedLayer)) {
+        protectedLayer.addTo(map);
+      }
+      map.fitBounds(L.featureGroup(matches).getBounds().pad(0.05));
+      status.textContent = matches.length + ' protected segments in ' + matches[0].feature.properties.area + '.';
+    });
   })
   .catch(function (err) {
     const status = document.getElementById('status');
