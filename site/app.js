@@ -173,7 +173,7 @@ Promise.all([
       return (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[–—]/g, '-').toLowerCase().trim();
     }
 
-    // Move the search form from the page onto the map, under the zoom buttons
+    // Move the search form from the page onto the map, in the top-left corner
     const searchControl = L.control({ position: 'topleft' });
     searchControl.onAdd = function () {
       const form = document.getElementById('search-form');
