@@ -3,8 +3,8 @@
   --page-background: #afbedc;
   --text: #1f2937;
   --muted: #4b5563;
-  --protected: #087b63;
-  --other: #8f2d00;
+  --protected: #2166ac;
+  --other: #d01c8b;
 }
 
 * {
@@ -89,7 +89,7 @@ a {
 }
 
 .layer-swatch.other {
-  background: var(--other);
+  background: repeating-linear-gradient(90deg, var(--other) 0 6px, transparent 6px 10px);
 }
 
 .layer-swatch.pavement {
@@ -141,4 +141,8 @@ a {
   margin: 6px 0 0;
   max-width: 220px;
   color: var(--muted);
+}
+.map-hint {
+  margin: 0 0 8px;
+  max-width: 220px;
 }

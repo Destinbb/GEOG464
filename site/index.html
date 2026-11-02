@@ -13,7 +13,7 @@
         <h1>Montreal: Bicycle Network</h1>
         <p class="lede">Bicycle commuting offers a relatively low-cost, healthy and environmentally friendly alternative to motorized transportation. However, for people who are new to cycling or unfamiliar with Montreal, navigating the city's cycling infrastructure can be intimidating. Futhermore, protected bike routes that offer a phyiscal barrier between the bike lane and vehicle traffic can provide a safer commuting experience. Understanding where bike routes are located and which types of infrastructure they offer can help people make more informed decisions about their commute.</p>
         <p><strong>This map is for:</strong> Cyclists in Montreal who may not be familiar with the city's bike-lane infrastructure.</p>
-        <p><strong>What you can do here:</strong> Compare protected and unprotected bike routes by toggling the visibility of each layer. Popup information for each segment explains its type, area, protection status, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
+        <p><strong>What you can do here:</strong>Click a road segment to see its details. Compare protected and unprotected bike routes by toggling the visibility of each layer. Popup information for each segment explains its type, area, protection status, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
         <section>
         <h2>Not in this iteration</h2>  
         <p>This map does not provide route planning, a or route safety rating as they are currently outside the scope of this MVP.</p>
@@ -40,6 +40,7 @@
 
       </section>
         <form id="search-form">
+          <p class="map-hint"><strong>Click any route</strong> for its details. Turn on <strong>Pavement condition</strong> (top right) to see road quality.</p>
           <label for="search-input">Find protected routes in a neighbourhood:</label>
           <input id="search-input" type="search" placeholder="e.g. Verdun, Plateau" />
           <button type="submit">Search</button>

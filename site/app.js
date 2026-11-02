@@ -1,4 +1,5 @@
 const map = L.map('map', { preferCanvas: true }).setView([45.51, -73.57], 11);
+map.zoomControl.setPosition('bottomright');
 
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -6,8 +7,8 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 const colours = {
-  Yes: '#047d00',
-  No: '#eb0d0d'
+  Yes: '#2166ac',
+  No: '#d01c8b'
 };
 const pavementColours = {
   'Excellent': '#ffffd4',
