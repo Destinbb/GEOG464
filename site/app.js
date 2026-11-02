@@ -203,6 +203,12 @@ Promise.all([
       map.fitBounds(L.featureGroup(matches).getBounds().pad(0.05));
       searchResult.textContent = matches.length + ' protected segments in ' + matches[0].feature.properties.area + '.';
     });
+    document.getElementById('search-input').addEventListener('input', function (event) {
+      if (event.target.value === '') {
+        map.setView([45.51, -73.57], 11);
+        searchResult.textContent = '';
+      }
+    });
   })
   .catch(function (err) {
     const status = document.getElementById('status');
