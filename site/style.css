@@ -104,6 +104,19 @@ a {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
 }
 
+#search-form {
+  padding: 8px 10px;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+  font-size: 14px;
+}
+
+#search-form label {
+  display: block;
+  margin-bottom: 4px;
+}
+
 .legend i {
   display: inline-block;
   width: 14px;
@@ -122,4 +135,10 @@ a {
     min-height: 420px;
     position: static;
   }
+}
+
+#search-result {
+  margin: 6px 0 0;
+  max-width: 220px;
+  color: var(--muted);
 }

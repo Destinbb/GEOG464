@@ -6,7 +6,7 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 const colours = {
-  Yes: '#05045d',
+  Yes: '#047d00',
   No: '#eb0d0d'
 };
 const pavementColours = {
@@ -169,8 +169,20 @@ Promise.all([
 
     // Search: lower-case, drop accents and treat – like - so "montreal-nord" finds "Montréal-Nord"
     function normalise(text) {
-      return (text || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[–—]/g, '-').toLowerCase().trim();
+      return (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[–—]/g, '-').toLowerCase().trim();
     }
+
+    // Move the search form from the page onto the map, under the zoom buttons
+    const searchControl = L.control({ position: 'topleft' });
+    searchControl.onAdd = function () {
+      const form = document.getElementById('search-form');
+      L.DomEvent.disableClickPropagation(form);
+      L.DomEvent.disableScrollPropagation(form);
+      return form;
+    };
+    searchControl.addTo(map);
+
+    const searchResult = document.getElementById('search-result');
 
     document.getElementById('search-form').addEventListener('submit', function (event) {
       event.preventDefault();
@@ -181,14 +193,14 @@ Promise.all([
       });
 
       if (matches.length === 0) {
-        status.textContent = 'No protected routes found for "' + typed + '".';
+        searchResult.textContent = 'No protected routes found for "' + typed + '".';
         return;
       }
       if (!map.hasLayer(protectedLayer)) {
         protectedLayer.addTo(map);
       }
       map.fitBounds(L.featureGroup(matches).getBounds().pad(0.05));
-      status.textContent = matches.length + ' protected segments in ' + matches[0].feature.properties.area + '.';
+      searchResult.textContent = matches.length + ' protected segments in ' + matches[0].feature.properties.area + '.';
     });
   })
   .catch(function (err) {
