@@ -8,7 +8,8 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 const colours = {
   Yes: '#2166ac',
-  No: '#d01c8b'
+  No: '#d01c8b',
+  Repair: '#1b7837'
 };
 const pavementColours = {
   'Excellent': '#ffffd4',
@@ -39,9 +40,10 @@ function loadGeoJSON(path) {
 
 Promise.all([
   loadGeoJSON('../data/bike_lanes_clean_english.geojson'),
-  loadGeoJSON('../data/bike_lanes_with_pavement.geojson')
+  loadGeoJSON('../data/bike_lanes_with_pavement.geojson'),
+  loadGeoJSON('../data/repair_stations.geojson')
 ])
-  .then(function ([data, pavementData]) {
+  .then(function ([data, pavementData, repairData]) {
     const protectedCount = data.features.filter(function (feature) {
       return feature.properties.protected === 'Oui';
     }).length;
@@ -117,10 +119,38 @@ Promise.all([
       }
     });
 
+    // OpenStreetMap tags use 'yes'/'no'; missing tags mean nobody recorded it
+    function yesNo(value) {
+      return value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'not recorded';
+    }
+
+    const repairLayer = L.geoJSON(repairData, {
+      pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, {
+          radius: 6,
+          color: '#ffffff',
+          weight: 2,
+          fillColor: colours.Repair,
+          fillOpacity: 1
+        });
+      },
+      onEachFeature: function (feature, layer) {
+        const p = feature.properties;
+        layer.bindPopup(
+          '<strong>Bike repair station</strong><br>' +
+          'Air pump: ' + yesNo(p['service:bicycle:pump']) + '<br>' +
+          'Tools: ' + yesNo(p['service:bicycle:tools']) + '<br>' +
+          'Hours: ' + (p.opening_hours || 'not recorded') + '<br>' +
+          'Operator: ' + (p.operator || 'not recorded')
+        );
+      }
+    });
+
     L.control.layers(null, {
       '<span class="layer-swatch protected"></span>Protected lanes': protectedLayer,
       '<span class="layer-swatch other"></span>Not identified as protected': otherLayer,
-      '<span class="layer-swatch pavement"></span>Pavement condition (matched streets)': pavementLayer
+      '<span class="layer-swatch pavement"></span>Pavement condition (matched streets)': pavementLayer,
+      '<span class="layer-swatch repair"></span>Bike repair stations': repairLayer
     }, { collapsed: false }).addTo(map);
 
     const legend = L.control({ position: 'bottomright' });

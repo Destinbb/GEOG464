@@ -92,6 +92,13 @@ a {
   background: repeating-linear-gradient(90deg, var(--other) 0 6px, transparent 6px 10px);
 }
 
+.layer-swatch.repair {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1b7837;
+}
+
 .layer-swatch.pavement {
   background: #fe9929;
 }

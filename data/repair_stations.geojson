@@ -1,0 +1,1786 @@
+{
+  "type": "FeatureCollection",
+  "generator": "overpass-turbo",
+  "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
+  "timestamp": "2026-11-03T00:48:55Z",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "node/4268270675",
+      "properties": {
+        "@id": "node/4268270675",
+        "amenity": "bicycle_repair_station",
+        "brand": "Dero",
+        "manual": "yes",
+        "name": "Station de réparation de vélos",
+        "note": "Montreal University",
+        "opening_hours": "24/7",
+        "operator": "Dero",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "sclaverand;schrader"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6174192,
+          45.5038992
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/4402850471",
+      "properties": {
+        "@id": "node/4402850471",
+        "amenity": "bicycle_repair_station",
+        "brand": "Dero",
+        "name": "Station de réparation de vélos",
+        "note": "Chemin de la Cote-Sainte-Catherine",
+        "opening_hours": "24/7",
+        "operator": "Dero",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6184223,
+          45.509025
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/4860731070",
+      "properties": {
+        "@id": "node/4860731070",
+        "access": "yes",
+        "addr:city": "Montréal",
+        "addr:housenumber": "1251",
+        "addr:street": "Rue Rachel Est",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "email": "info@biciborne.com",
+        "level": "0",
+        "name": "Biciborne",
+        "opening_hours": "24/7",
+        "operator": "Biciborne",
+        "phone": "+1 450 778 4091",
+        "position": "aproximative",
+        "service:bicycle:chain_tool": "yes",
+        "service:bicycle:pump": "no",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "sclaverand;schrader"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5729537,
+          45.5271527
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5256489882",
+      "properties": {
+        "@id": "node/5256489882",
+        "amenity": "bicycle_repair_station",
+        "opening_hours": "24/7",
+        "service:bicycle:pump": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6734271,
+          45.557558
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5667508565",
+      "properties": {
+        "@id": "node/5667508565",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "name": "Outils Vélo",
+        "service:bicycle:pump": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5355555,
+          45.5205649
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5703102327",
+      "properties": {
+        "@id": "node/5703102327",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "fee": "no",
+        "name": "Biciborne",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5957095,
+          45.4266874
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5732949571",
+      "properties": {
+        "@id": "node/5732949571",
+        "amenity": "bicycle_repair_station",
+        "brand": "Saris",
+        "fee": "no",
+        "opening_hours": "24/7",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5918494,
+          45.5338389
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5732949575",
+      "properties": {
+        "@id": "node/5732949575",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "opening_hours": "24/7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5848176,
+          45.5433626
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/5839200149",
+      "properties": {
+        "@id": "node/5839200149",
+        "amenity": "bicycle_repair_station",
+        "brand": "BiciBorne",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5820627,
+          45.4565288
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6415172885",
+      "properties": {
+        "@id": "node/6415172885",
+        "amenity": "bicycle_repair_station",
+        "name": "Bici Borne"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6859056,
+          45.433738
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6440659769",
+      "properties": {
+        "@id": "node/6440659769",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.7159793,
+          45.4381943
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6653792335",
+      "properties": {
+        "@id": "node/6653792335",
+        "amenity": "bicycle_repair_station",
+        "brand": "Uni",
+        "fee": "no",
+        "opening_hours": "24/7",
+        "operator:type": "public",
+        "service:bicycle:pump": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6160464,
+          45.5346319
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6735105060",
+      "properties": {
+        "@id": "node/6735105060",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "name": "Biciborne"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.7002562,
+          45.5074992
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6735105061",
+      "properties": {
+        "@id": "node/6735105061",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "fee": "no",
+        "name": "Biciborne",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6755768,
+          45.5289387
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6848155818",
+      "properties": {
+        "@id": "node/6848155818",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-10-20",
+        "operator": "Biciborne",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5794328,
+          45.4830693
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/6848202492",
+      "properties": {
+        "@id": "node/6848202492",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "manometer": "broken",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "operational",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5807806,
+          45.4800555
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7450479404",
+      "properties": {
+        "@id": "node/7450479404",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "level": "0",
+        "manual": "yes",
+        "name": "Biciborne",
+        "operator": "Biciborne",
+        "service:bicycle:chain_tool": "yes",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "sclaverand;schrader"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5750915,
+          45.5164566
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/7721854764",
+      "properties": {
+        "@id": "node/7721854764",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "manometer": "broken",
+        "manual": "yes",
+        "name": "Biciborne",
+        "opening_hours": "24/7",
+        "panoramax": "16444c29-8923-4506-ae8f-95e92f3632e4",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "broken",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5483103,
+          45.4899584
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/8891291689",
+      "properties": {
+        "@id": "node/8891291689",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "opening_hours": "24/7",
+        "operator": "Ville de Montréal",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:repair": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6313345,
+          45.5319303
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/8942826125",
+      "properties": {
+        "@id": "node/8942826125",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "fee": "no",
+        "manual": "yes",
+        "name": "Biciborne",
+        "operator": "Ville de Montréal",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5691791,
+          45.47823
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/8943244128",
+      "properties": {
+        "@id": "node/8943244128",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "manometer": "broken",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "operator": "Ville de Montréal",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "broken",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5637641,
+          45.4793861
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/8954243006",
+      "properties": {
+        "@id": "node/8954243006",
+        "amenity": "bicycle_repair_station",
+        "brand": "Bici Borne",
+        "fee": "no",
+        "image": "https://web.archive.org/web/20221117173448/https://westnordost.de/p/101029.jpg",
+        "opening_hours": "24/7",
+        "service:bicycle:diy": "yes",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5509369,
+          45.5559869
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9022237724",
+      "properties": {
+        "@id": "node/9022237724",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "operator": "Ville de Montréal",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5537001,
+          45.4932387
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9027244207",
+      "properties": {
+        "@id": "node/9027244207",
+        "amenity": "bicycle_repair_station",
+        "operator": "Biciborne",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5527073,
+          45.498775
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9033821922",
+      "properties": {
+        "@id": "node/9033821922",
+        "amenity": "bicycle_repair_station",
+        "operator": "Cycles Gervais Rioux",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:tools": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5912323,
+          45.517538
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9561331409",
+      "properties": {
+        "@id": "node/9561331409",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "covered": "no",
+        "fee": "no",
+        "manufacturer": "Biciborne",
+        "opening_hours": "24/7",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6160193,
+          45.5235715
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9562789445",
+      "properties": {
+        "@id": "node/9562789445",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "covered": "no",
+        "fee": "no",
+        "manufacturer": "Biciborne",
+        "opening_hours": "24/7",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6185873,
+          45.522121
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9740137449",
+      "properties": {
+        "@id": "node/9740137449",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-04-26",
+        "fee": "no",
+        "opening_hours": "24/7",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6371725,
+          45.5551025
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9773337233",
+      "properties": {
+        "@id": "node/9773337233",
+        "amenity": "bicycle_repair_station",
+        "brand": "Saris",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6201876,
+          45.5264791
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9817424657",
+      "properties": {
+        "@id": "node/9817424657",
+        "amenity": "bicycle_repair_station",
+        "service:bicycle:pump": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6334517,
+          45.452021
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/9970829007",
+      "properties": {
+        "@id": "node/9970829007",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "opening_hours": "24/7",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5953807,
+          45.4746237
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/10038436457",
+      "properties": {
+        "@id": "node/10038436457",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "covered": "no",
+        "email": "theflat.bikecollective@gmail.com",
+        "fee": "no",
+        "indoor": "no",
+        "level": "0",
+        "manometer": "no",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "operator": "the Flat Bike Collective",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "yes",
+        "service:bicycle:repair": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5765982,
+          45.5059188
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/10800328130",
+      "properties": {
+        "@id": "node/10800328130",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2025-09-09",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "operator": "Ville de Montreal",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "operational",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5640256,
+          45.4958558
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/10861570836",
+      "properties": {
+        "@id": "node/10861570836",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6032786,
+          45.4463998
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11023281169",
+      "properties": {
+        "@id": "node/11023281169",
+        "amenity": "bicycle_repair_station",
+        "opening_hours": "24/7",
+        "service:bicycle:pump": "no",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5764394,
+          45.5028472
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11023317377",
+      "properties": {
+        "@id": "node/11023317377",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-10-02",
+        "email": "info@biciborne.com",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "operator": "Concordia University / Biciborne",
+        "panoramax": "5aed7191-d2ae-49fc-be1f-742437a297db",
+        "phone": "+1 450 778 4091",
+        "service:bicycle:chain_tool": "yes",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "operational",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5788484,
+          45.4968318
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11023595321",
+      "properties": {
+        "@id": "node/11023595321",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "email": "info@biciborne.com",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "operator": "Biciborne",
+        "phone": "+1 450 778 4091",
+        "service:bicycle:chain_tool": "yes",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "broken",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5446477,
+          45.532402
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11178065094",
+      "properties": {
+        "@id": "node/11178065094",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5565549,
+          45.5334947
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11196536030",
+      "properties": {
+        "@id": "node/11196536030",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "email": "info@halt-inc.com",
+        "opening_hours": "24/7",
+        "operator": "Cyclohalt",
+        "phone": "+1 514 692 6213",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "no",
+        "service:bicycle:tools": "no",
+        "valves": "sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5497749,
+          45.525623
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11207844852",
+      "properties": {
+        "@id": "node/11207844852",
+        "amenity": "bicycle_repair_station",
+        "brand": "Bici Borne",
+        "check_date": "2026-10-10",
+        "fee": "no",
+        "operator": "Bici Borne",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5808692,
+          45.5554962
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11299096815",
+      "properties": {
+        "@id": "node/11299096815",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6015521,
+          45.5618213
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11389745395",
+      "properties": {
+        "@id": "node/11389745395",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6647766,
+          45.5543995
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11480702510",
+      "properties": {
+        "@id": "node/11480702510",
+        "amenity": "bicycle_repair_station",
+        "colour": "green",
+        "operator": "Desjardins"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5506278,
+          45.55903
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11565171128",
+      "properties": {
+        "@id": "node/11565171128",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "opening_hours": "Mo-Su 06:00-23:00",
+        "operator": "Société du Parc Jean-Drapeau"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5270755,
+          45.5149318
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11582495336",
+      "properties": {
+        "@id": "node/11582495336",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "email": "fcc.fod@mcgill.ca",
+        "fee": "no",
+        "manometer": "yes",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "operator": "McGill University Facilities",
+        "panoramax": "a86e914c-c034-4e69-87a8-88e0b0dbcfb1",
+        "phone": "+1 514 398 4555",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "operational",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5748188,
+          45.5042051
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11663826863",
+      "properties": {
+        "@id": "node/11663826863",
+        "amenity": "bicycle_repair_station",
+        "service:bicycle:pump": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5960809,
+          45.5879004
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11900048187",
+      "properties": {
+        "@id": "node/11900048187",
+        "amenity": "bicycle_repair_station",
+        "brand": "Bici Borne",
+        "operator": "Bixi",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.539754,
+          45.5532454
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/11965055623",
+      "properties": {
+        "@id": "node/11965055623",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "manometer": "yes",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.72606,
+          45.5312134
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12036679170",
+      "properties": {
+        "@id": "node/12036679170",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.542848,
+          45.6719347
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12048045848",
+      "properties": {
+        "@id": "node/12048045848",
+        "amenity": "bicycle_repair_station",
+        "brand": "Biciborne",
+        "check_date": "2025-11-18",
+        "fee": "no",
+        "operator": "Biciborne",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5405217,
+          45.576848
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12058150878",
+      "properties": {
+        "@id": "node/12058150878",
+        "amenity": "bicycle_repair_station",
+        "brand": "Bici Borne",
+        "check_date": "2026-08-17",
+        "fee": "no",
+        "operator": "Bici Borne",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5687681,
+          45.552365
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12070828611",
+      "properties": {
+        "@id": "node/12070828611",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2025-11-02",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "no",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5549976,
+          45.5072503
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12219579976",
+      "properties": {
+        "@id": "node/12219579976",
+        "access": "yes",
+        "amenity": "bicycle_repair_station",
+        "manometer": "broken",
+        "manual": "yes",
+        "opening_hours": "24/7",
+        "operator": "Le Sud-Ouest de Montréal",
+        "panoramax": "0492c1e9-8848-49a6-a8e3-435cc3126b3e",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:pump:operational_status": "operational",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "schrader;sclaverand"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.575512,
+          45.4791728
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12222622461",
+      "properties": {
+        "@id": "node/12222622461",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5997458,
+          45.5347552
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12300182118",
+      "properties": {
+        "@id": "node/12300182118",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2025-11-22",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5947859,
+          45.4557054
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12304952492",
+      "properties": {
+        "@id": "node/12304952492",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5251949,
+          45.5608726
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12307324070",
+      "properties": {
+        "@id": "node/12307324070",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6111707,
+          45.5860473
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12310286307",
+      "properties": {
+        "@id": "node/12310286307",
+        "amenity": "bicycle_repair_station",
+        "colour": "green",
+        "fee": "no",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5553717,
+          45.5575431
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12351356468",
+      "properties": {
+        "@id": "node/12351356468",
+        "amenity": "bicycle_repair_station",
+        "brand": "Bici Borne",
+        "fee": "no",
+        "operator": "Bici Borne",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5952265,
+          45.5392887
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12351371576",
+      "properties": {
+        "@id": "node/12351371576",
+        "amenity": "bicycle_repair_station",
+        "brand": "Bici Borne",
+        "fee": "no",
+        "operator": "Bici Borne",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5821258,
+          45.5520393
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12368687732",
+      "properties": {
+        "@id": "node/12368687732",
+        "amenity": "bicycle_repair_station",
+        "service:bicycle:pump": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6184326,
+          45.4987492
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12737488359",
+      "properties": {
+        "@id": "node/12737488359",
+        "amenity": "bicycle_repair_station",
+        "brand": "Halt",
+        "fee": "no",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:repair": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.7483258,
+          45.513551
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12750225686",
+      "properties": {
+        "@id": "node/12750225686",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.9206647,
+          45.4619268
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12783835901",
+      "properties": {
+        "@id": "node/12783835901",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6626645,
+          45.5651124
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12793384167",
+      "properties": {
+        "@id": "node/12793384167",
+        "amenity": "bicycle_repair_station",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "no",
+        "service:bicycle:tools": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5800549,
+          45.5199204
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12849487921",
+      "properties": {
+        "@id": "node/12849487921",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2025-08-24",
+        "fee": "no",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5561135,
+          45.5088608
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12943751543",
+      "properties": {
+        "@id": "node/12943751543",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-07-04",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6395984,
+          45.6076951
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/12950733966",
+      "properties": {
+        "@id": "node/12950733966",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5311858,
+          45.5526261
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13018158640",
+      "properties": {
+        "@id": "node/13018158640",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.7174208,
+          45.5357567
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13119987248",
+      "properties": {
+        "@id": "node/13119987248",
+        "amenity": "bicycle_repair_station",
+        "fee": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.615128,
+          45.5046424
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13136634966",
+      "properties": {
+        "@id": "node/13136634966",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2025-09-11",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6392171,
+          45.4588046
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13186893217",
+      "properties": {
+        "@id": "node/13186893217",
+        "amenity": "bicycle_repair_station",
+        "colour": "black",
+        "fee": "no"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.623008,
+          45.5001962
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13244247055",
+      "properties": {
+        "@id": "node/13244247055",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5445867,
+          45.499814
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13667349626",
+      "properties": {
+        "@id": "node/13667349626",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-03-21",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5530881,
+          45.4988565
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13763851546",
+      "properties": {
+        "@id": "node/13763851546",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-04-26",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6575532,
+          45.5788579
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13928623475",
+      "properties": {
+        "@id": "node/13928623475",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.554421,
+          45.5120763
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13953004147",
+      "properties": {
+        "@id": "node/13953004147",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-06-19",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5404536,
+          45.5509631
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13954538967",
+      "properties": {
+        "@id": "node/13954538967",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-06-20",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5237899,
+          45.5951126
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/13956189297",
+      "properties": {
+        "@id": "node/13956189297",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-06-21",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5832983,
+          45.557753
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14041997990",
+      "properties": {
+        "@id": "node/14041997990",
+        "amenity": "bicycle_repair_station",
+        "brand": "BiciBorne",
+        "check_date": "2026-08-31",
+        "colour": "grey",
+        "fee": "no",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes",
+        "valves": "sclaverand;schrader"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5720639,
+          45.5006779
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14096623799",
+      "properties": {
+        "@id": "node/14096623799",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-08-14",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5742961,
+          45.5087926
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14116493351",
+      "properties": {
+        "@id": "node/14116493351",
+        "amenity": "bicycle_repair_station"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5102978,
+          45.5927184
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14178515592",
+      "properties": {
+        "@id": "node/14178515592",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "service:bicycle:pump": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.717362,
+          45.5357393
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14178705773",
+      "properties": {
+        "@id": "node/14178705773",
+        "amenity": "bicycle_repair_station",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5918391,
+          45.5388815
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14196063997",
+      "properties": {
+        "@id": "node/14196063997",
+        "amenity": "bicycle_repair_station",
+        "covered": "no",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6008563,
+          45.4346927
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14220255923",
+      "properties": {
+        "@id": "node/14220255923",
+        "amenity": "bicycle_repair_station",
+        "brand": "Bici Borne",
+        "fee": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.6435087,
+          45.5517745
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "node/14220655084",
+      "properties": {
+        "@id": "node/14220655084",
+        "amenity": "bicycle_repair_station",
+        "check_date": "2026-09-26",
+        "level": "-1",
+        "service:bicycle:chain_tool": "no",
+        "service:bicycle:pump": "yes",
+        "service:bicycle:stand": "yes",
+        "service:bicycle:tools": "yes"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.5500818,
+          45.5574747
+        ]
+      }
+    }
+  ]
+}
