@@ -198,9 +198,11 @@ Promise.all([
         protectedCount + ' protected, ' + otherCount + ' other';
     }
 
-    // Search: lower-case, drop accents and treat – like - so "montreal-nord" finds "Montréal-Nord"
+    // Search: lower-case, drop accents and apostrophes, and treat hyphens, dashes and spaces the same,
+    // so "montreal nord", "montreal-nord" and "Montréal–Nord" all match
     function normalise(text) {
-      return (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[–—]/g, '-').toLowerCase().trim();
+      return (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’]/g, '')
+        .replace(/[-–—\s]+/g, ' ').toLowerCase().trim();
     }
 
     // Move the search form from the page onto the map, in the top-left corner
