@@ -258,9 +258,23 @@ Promise.all([
     });
   })
   .catch(function (err) {
+    const message = 'The bike-lane data could not be loaded. Check your internet connection and reload the page.';
     const status = document.getElementById('status');
     if (status) {
-      status.textContent = 'Could not load bike-lane data. Open the console (F12) for details.';
+      status.textContent = message;
     }
+
+    // Show the same message on the map, where the reader is looking
+    const errorBox = L.control({ position: 'topleft' });
+    errorBox.onAdd = function () {
+      const div = L.DomUtil.create('div', 'legend map-error');
+      div.setAttribute('role', 'alert');
+      div.textContent = message;
+      return div;
+    };
+    errorBox.addTo(map);
+
+    // The search cannot work without the data, so hide it
+    document.getElementById('search-form').hidden = true;
     console.error(err);
   });

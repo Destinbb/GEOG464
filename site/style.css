@@ -124,6 +124,12 @@ a {
   margin-bottom: 4px;
 }
 
+.map-error {
+  max-width: 240px;
+  color: #9b1c1c;
+  font-weight: 600;
+}
+
 .legend i {
   display: inline-block;
   width: 14px;
