@@ -41,7 +41,11 @@ function loadGeoJSON(path) {
 Promise.all([
   loadGeoJSON('../data/bike_lanes_clean_english.geojson'),
   loadGeoJSON('../data/bike_lanes_with_pavement.geojson'),
-  loadGeoJSON('../data/repair_stations.geojson')
+  // Repair stations are optional: if they fail, return null so the bike lanes still load
+  loadGeoJSON('../data/repair_stations.geojson').catch(function (err) {
+    console.error(err);
+    return null;
+  })
 ])
   .then(function ([data, pavementData, repairData]) {
     const protectedCount = data.features.filter(function (feature) {
@@ -146,12 +150,15 @@ Promise.all([
       }
     });
 
-    L.control.layers(null, {
+    const overlays = {
       '<span class="layer-swatch protected"></span>Protected lanes': protectedLayer,
       '<span class="layer-swatch other"></span>Not identified as protected': otherLayer,
-      '<span class="layer-swatch pavement"></span>Pavement condition (matched streets)': pavementLayer,
-      '<span class="layer-swatch repair"></span>Bike repair stations': repairLayer
-    }, { collapsed: false }).addTo(map);
+      '<span class="layer-swatch pavement"></span>Pavement condition (matched streets)': pavementLayer
+    };
+    if (repairData) {
+      overlays['<span class="layer-swatch repair"></span>Bike repair stations'] = repairLayer;
+    }
+    L.control.layers(null, overlays, { collapsed: false }).addTo(map);
 
     const legend = L.control({ position: 'bottomright' });
     legend.onAdd = function () {
@@ -195,7 +202,8 @@ Promise.all([
     if (status) {
       status.textContent =
         data.features.length + ' bike-lane segments shown: ' +
-        protectedCount + ' protected, ' + otherCount + ' other';
+        protectedCount + ' protected, ' + otherCount + ' other.' +
+        (repairData ? '' : ' Bike repair stations could not be loaded.');
     }
 
     // Search: lower-case, drop accents and apostrophes, and treat hyphens, dashes and spaces the same,
