@@ -158,9 +158,12 @@ Promise.all([
     if (repairData) {
       overlays['<span class="layer-swatch repair"></span>Bike repair stations'] = repairLayer;
     }
-    L.control.layers(null, overlays, { collapsed: false }).addTo(map);
+    // Collapse the layer list into an icon on phones so it doesn't cover the map
+    const isPhone = window.innerWidth <= 800;
+    L.control.layers(null, overlays, { collapsed: isPhone }).addTo(map);
 
-    const legend = L.control({ position: 'bottomright' });
+    // On phones the legend goes bottom-left so it doesn't stack on top of the zoom buttons
+    const legend = L.control({ position: isPhone ? 'bottomleft' : 'bottomright' });
     legend.onAdd = function () {
       const div = L.DomUtil.create('div', 'legend');
       const conditions = [
@@ -172,10 +175,11 @@ Promise.all([
       ];
 
       div.innerHTML =
-        '<strong>Pavement condition. Colours show pavement condition categories; click on a segment to see its PCI score.</strong><br>' +
+        '<strong>Pavement condition</strong>' +
+        '<span class="legend-note"><br>Colours show pavement condition categories; click on a segment to see its PCI score.</span>' +
         conditions.map(function ([value, label]) {
-          return '<i style="background:' + colourForPavement(value) + '"></i>' + label;
-        }).join('<br>');
+          return '<span class="legend-item"><i style="background:' + colourForPavement(value) + '"></i>' + label + '</span>';
+        }).join('');
 
       return div;
     };
@@ -213,15 +217,21 @@ Promise.all([
         .replace(/[-–—\s]+/g, ' ').toLowerCase().trim();
     }
 
-    // Move the search form from the page onto the map, in the top-left corner
-    const searchControl = L.control({ position: 'topleft' });
-    searchControl.onAdd = function () {
-      const form = document.getElementById('search-form');
-      L.DomEvent.disableClickPropagation(form);
-      L.DomEvent.disableScrollPropagation(form);
-      return form;
-    };
-    searchControl.addTo(map);
+    // Move the search form from the page onto the map, in the top-left corner.
+    // On phones there's no room on the map, so put it just above the map instead.
+    if (isPhone) {
+      const mapElement = document.getElementById('map');
+      mapElement.parentNode.insertBefore(document.getElementById('search-form'), mapElement);
+    } else {
+      const searchControl = L.control({ position: 'topleft' });
+      searchControl.onAdd = function () {
+        const form = document.getElementById('search-form');
+        L.DomEvent.disableClickPropagation(form);
+        L.DomEvent.disableScrollPropagation(form);
+        return form;
+      };
+      searchControl.addTo(map);
+    }
 
     const searchResult = document.getElementById('search-result');
 
