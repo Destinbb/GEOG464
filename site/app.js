@@ -223,6 +223,21 @@ Promise.all([
         return query && normalise(layer.feature.properties.area).includes(query);
       });
 
+      if (query === '') {
+        searchResult.textContent = 'Type a neighbourhood name, e.g. Verdun.';
+        return;
+      }
+
+      // A partial name like "la" can match several boroughs: list them instead of a mixed count
+      const areas = [...new Set(matches.map(function (layer) {
+        return layer.feature.properties.area;
+      }))];
+      if (areas.length > 1) {
+        searchResult.textContent = '"' + typed + '" matches ' + areas.length +
+          ' neighbourhoods: ' + areas.join(', ') + '. Type more of the name.';
+        return;
+      }
+
       if (matches.length === 0) {
         searchResult.textContent = 'No protected routes found for "' + typed + '".';
         return;
