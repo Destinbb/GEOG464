@@ -44,22 +44,30 @@ My edge case is a bicycle route segment with no matching pavement condition reco
 
 
 # Tests
-Test 1: turn on the layer switcher for PCI in the webpages legend
+Test 1: turn on the layer switcher for PCI in the legend
 -Expected: PCI layer loads and displays the roads pavement condition rating 
-Test 2: I click a segment of road to view its pavement condition
+Test 2: Click a segment of road to view its pavement condition
 -Expected: the pop-up opens and displays the segments PCI score and rating 
 Test 3: A bike route with no pavement match. With the pavement layer on, I zoom in and find any protected route that still displays as blue. It has no record in the pavement survey, either because its ID_TRC is 0 (187 protected routes) or because its ID_TRC is not in the survey (468 protected routes). Example: the dedicated path at the south tip of Île-des-Sœurs, Verdun, which has ID_TRC 0.
 -Expected: the path stays blue with no pavement colour over it, the normal popup opens with no PCI score, and no errors come from app.js
--Result: 
+-Result: PCI layer is not displayed over Île-des-Sœurs route, but popup still displays route information
+
+## A3 feature, part 2: pavement summary in the neighbourhood search
+Test 4: I search "Verdun".
+-Expected: the map zooms to Verdun and the box says "277 protected segments in Verdun. 167 have a pavement survey record; 69 of those (41%) are in good or excellent condition."
+Test 5: I search "ville marie".
+-Expected: "263 protected segments in Ville-Marie. 226 have a pavement survey record; 61 of those (27%) are in good or excellent condition."
+Test 6: A neighbourhood where no surveyed segment is in good condition. I search "Pierrefonds".
+-Expected: "17 protected segments in Pierrefonds-Roxboro. 9 have a pavement survey record; 0 of those (0%) are in good or excellent condition." The page says 0 out of 9 surveyed, not "no data", and there are no console errors.
 
  ## Pre-flight report (Lab 7)
 | Check | Result | What I did |
 | --- | --- | --- |
-| 1. Cold start | fault:console showed "favicon.ico Failed to load resource: 404" on a fresh private-window load; the map and data loaded fine| fixed in commit "Add bike favicon to stop 404 in console"|
+| 1. Cold start | fault:console showed "favicon.ico Failed to load resource: 404" on a fresh private-window load; the map and data loaded fine| fixed in commit "Add bike icon to favicon to stop 404 in console"|
 | 2. Read every label| Pass| |
-| 3. Ask twice |Fault:typing "l" said "2088 protected segments in Ahuntsic-Cartierville" (that borough has 311); "la" said "887 in Saint-Laurent" (it has 30); "le" said "1433 in Ahuntsic-Cartierville". The map zoomed out to several boroughs at once. A partial name matches many boroughs, but the message names only the first. | |
-| 4. The edge | | |
-| 5. The data does not come | | |
-| 6. On a phone (size view and my phone) | | |
-| 7. Mouse in my pocket | | |
-| 8. Accessibility audit | | |
+| 3. Ask twice |Fault:typing "l" said "2088 protected segments in Ahuntsic-Cartierville" (that borough has 311); "la" said "887 in Saint-Laurent" (it has 30); "le" said "1433 in Ahuntsic-Cartierville". The map zoomed out to several boroughs at once. A partial name matches many boroughs, but the message names only the first. | fixed in commit: Search lists matching boroughs instead of a mixed count: when a search matches more than one borough, the box lists them and asks the reader to type more, and the map doesn't move. Retested: "la" lists 6 boroughs; "Verdun" says 277|
+| 4. The edge | Fault:(a) an empty search said "No protected routes found for ". (b) Only the exact hyphenated spelling "Montreal-nord" worked: "montreal nord" and "plateau mont royal" said "No protected routes found", although those boroughs have 40 and 201. |fixed in commit "Search ignores hyphens, spaces and apostrophes": "montreal nord", "plateau mont royal" and "cote des neiges" now find their boroughs. Retested on the live site.
+| 5. The data does not come | Fault:fault: with bike_lanes_clean_english.geojson blocked, the map showed with no data and no message nearby. The only message was in the status line at the bottom of the text column, and it told the reader to "Open the console (F12)". The search box was still there, and pressing Search reloaded the page. | fixed in commit by adding catch: "Show data-load error on the map and hide search": a plain-language message now appears on the map and the search box is hidden. Retested by blocking the file again.|
+| 6. On a phone (size view and my phone) |Fault: Major furthermore mobile optimization to be done | |
+| 7. Mouse in my pocket | Pass| |
+| 8. Accessibility audit |Pass: Lighthouse Accessibility 100 on the live site; no red or orange items. | |
