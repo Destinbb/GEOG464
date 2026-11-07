@@ -77,6 +77,15 @@ Promise.all([
         'Year-round: ' + (yesNoNames[p.year_round] || p.year_round || 'unknown') + '<br>' +
         'Length: ' + (p.length_m || 0) + ' m'
       );
+
+      // Thicken the line on hover, then put it back to its normal width
+      const normalWeight = layer.options.weight;
+      layer.on('mouseover', function () {
+        layer.setStyle({ weight: normalWeight + 8 });
+      });
+      layer.on('mouseout', function () {
+        layer.setStyle({ weight: normalWeight });
+      });
     }
 
     const protectedLayer = L.geoJSON(data, {
@@ -266,7 +275,26 @@ Promise.all([
         protectedLayer.addTo(map);
       }
       map.fitBounds(L.featureGroup(matches).getBounds().pad(0.05));
-      searchResult.textContent = matches.length + ' protected segments in ' + matches[0].feature.properties.area + '.';
+
+      // Pavement summary: of this neighbourhood's protected segments that have a survey record,
+      // how many are in good or excellent condition. Segments with no record are left out, not counted as bad.
+      const area = matches[0].feature.properties.area;
+      const surveyed = pavementData.features.filter(function (feature) {
+        return feature.properties.protected === 'Oui' && feature.properties.area === area;
+      });
+      const good = surveyed.filter(function (feature) {
+        const condition = feature.properties.pavement_condition;
+        return condition === 'Excellent' || condition === 'Bon';
+      }).length;
+
+      let summary = matches.length + ' protected segments in ' + area + '. ';
+      if (surveyed.length === 0) {
+        summary += 'None have a pavement survey record.';
+      } else {
+        summary += surveyed.length + ' have a pavement survey record; ' + good + ' of those (' +
+          Math.round(100 * good / surveyed.length) + '%) are in good or excellent condition.';
+      }
+      searchResult.textContent = summary;
     });
     document.getElementById('search-input').addEventListener('input', function (event) {
       if (event.target.value === '') {
