@@ -8,7 +8,7 @@
 2. **Audience:** This map is for cyclists in Montreal who want to explore the city's bicycle network by area and facility type.
 3. **Core action:** Toggle the protected and not-identified as protected layers, then click a segment to inspect its type, area, protection status, year-round status, and recorded length.
 4. **Boundary:** This iteration includes facilities marked as within the City of Montreal and does not provide routing, surface-condition, closure, or safety assessments.
-5. **Data:** The map uses Montreal Open Data's continuously updated "Reseau cyclable" GeoJSON, read and narrowed in the project notebook to city records with usable line geometry and required descriptive fields. :https://www.donneesquebec.ca/recherche/dataset/vmtl-pistes-cyclables/resource/0dc6612a-be66-406b-b2d9-59c9e1c65ebf 
+5. **Data:** The map uses Montreal Open Data's continuously updated "Reseau cyclable" GeoJSON, read and narrowed in the project notebook to city records with usable line geometry and required descriptive fields. :https://www.donneesquebec.ca/recherche/dataset/vmtl-pistes-cyclables/resource/0dc6612a-be66-406b-b2d9-59c9e1c65ebf. City of Montréal, licensed under CC BY 4.0, accessed October 1, 2026. The notebook rounds coordinates to 5 decimal places (about 1 m) and writes compact JSON, which brought the cleaned file from 5.44 MB to 3.60 MB (under the 5 MB guide) and the pavement file from 3.43 MB to 2.58 MB, so the map loads faster on a phone. The feature counts did not change (8,245 bike segments, 5,245 with pavement).
 6. ## A3 data: 
 the pavement layer uses ([Indicateurs de condition des chaussées du réseau routier]), published by the City of Montréal ([https://donnees.montreal.ca/dataset/condition-chaussees-reseau-routier#additional-info]), licensed under Creative Commons Attribution 4.0 International. Accessed October 23, 2026. I joined the pavement PCI condition catergory, score and survey date to bike-network GeoJSON using ID_TRC, and only included matched records in the pavement overlay (5,245 street segments). These ratings describe surveyed street segments but may not represent the bike-lane surface itself.
 
@@ -26,7 +26,7 @@ After adding my second data layer, I feel like I really have to work on the core
 ## Run the MVP
 
 1. Open the `TermProj` folder in VS Code.
-2. Open `notebooks/TermProject.ipynb` and run every cell from top to bottom. It reads the raw GeoJSON, reports exclusions, writes `bike_lanes_clean_english.geojson`, and finishes with count, geometry-extent, geometry-type, and property checks.
+2. Open `notebooks/TermProject.ipynb` and run every cell from top to bottom. It reads the raw GeoJSON, reports exclusions, rounds coordinates to 5 decimals, writes `bike_lanes_clean_english.geojson`, and finishes with count, geometry-extent, geometry-type, property and file-size (under 5 MB) checks.
 3. Right-click `site/index.html` and choose **Open with Live Server**. The page fetches the notebook output from `../data/bike_lanes_clean_english.geojson`
 4. Use the map layer checkboxes to show or hide protected lanes. Click a line for its attributes.
 
