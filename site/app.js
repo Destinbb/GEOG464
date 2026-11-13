@@ -12,6 +12,25 @@ map.attributionControl.addAttribution(
 
 const isPhone = window.innerWidth <= 800;
 
+// ---------- Information tabs ----------
+// Each tab opens its block of text; clicking the open tab again closes it. Only one is open at a time.
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(function (tab) {
+  tab.addEventListener('click', function () {
+    const opening = tab.getAttribute('aria-expanded') !== 'true';
+    tabs.forEach(function (other) {
+      other.setAttribute('aria-expanded', 'false');
+      document.getElementById(other.getAttribute('aria-controls')).hidden = true;
+    });
+    if (opening) {
+      tab.setAttribute('aria-expanded', 'true');
+      document.getElementById(tab.getAttribute('aria-controls')).hidden = false;
+    }
+    // The map gets shorter or taller when a panel opens or closes, so tell Leaflet its new size
+    map.invalidateSize();
+  });
+});
+
 // ---------- Locate me ----------
 // A rough box around the island of Montreal, used to keep address results on the island
 const ISLAND = { west: -73.98, south: 45.40, east: -73.47, north: 45.71 };
@@ -53,38 +72,28 @@ function locateMe() {
   });
 }
 
-const locateControl = L.control({ position: 'bottomright' });
-locateControl.onAdd = function () {
-  const div = L.DomUtil.create('div', 'leaflet-bar locate-control');
-  const button = L.DomUtil.create('button', 'locate-button', div);
-  button.type = 'button';
-  button.textContent = 'Locate me';
-  const message = L.DomUtil.create('p', 'locate-message', div);
-  message.setAttribute('role', 'status');
-  message.hidden = true;
-  L.DomEvent.disableClickPropagation(div);
+// The Locate me button sits in the tools row at the top of the page
+const locateButton = document.getElementById('locate-button');
+const locateMessage = document.querySelector('.locate-message');
 
-  button.addEventListener('click', function () {
-    button.disabled = true;
-    button.textContent = 'Locating…';
-    message.hidden = true;
-    locateMe()
-      .then(function (latlng) {
-        map.setView(latlng, Math.max(map.getZoom(), 16));
-        myLocationMarker.openPopup();
-      })
-      .catch(function (err) {
-        message.textContent = err.message;
-        message.hidden = false;
-      })
-      .finally(function () {
-        button.disabled = false;
-        button.textContent = 'Locate me';
-      });
-  });
-  return div;
-};
-locateControl.addTo(map);
+locateButton.addEventListener('click', function () {
+  locateButton.disabled = true;
+  locateButton.textContent = 'Locating…';
+  locateMessage.hidden = true;
+  locateMe()
+    .then(function (latlng) {
+      map.setView(latlng, Math.max(map.getZoom(), 16));
+      myLocationMarker.openPopup();
+    })
+    .catch(function (err) {
+      locateMessage.textContent = err.message;
+      locateMessage.hidden = false;
+    })
+    .finally(function () {
+      locateButton.disabled = false;
+      locateButton.textContent = 'Locate me';
+    });
+});
 
 // ---------- Plan a route from A to B ----------
 // Route line sits in its own pane, above the bike-lane layers, so toggling layers never hides it
@@ -152,19 +161,18 @@ const routeTo = document.getElementById('route-to');
 const routeResult = document.getElementById('route-result');
 const MY_LOCATION = 'My location';
 
-// Put the route form on the map (top left) on a computer, or just above the map on a phone
-if (isPhone) {
-  const mapElement = document.getElementById('map');
-  mapElement.parentNode.insertBefore(routeForm, mapElement);
-} else {
-  const routeControl = L.control({ position: 'topleft' });
-  routeControl.onAdd = function () {
-    L.DomEvent.disableClickPropagation(routeForm);
-    L.DomEvent.disableScrollPropagation(routeForm);
-    return routeForm;
-  };
-  routeControl.addTo(map);
-}
+// On phones the route form is folded up; the "Plan a route" button opens and closes it.
+// (On a computer the button is hidden by CSS and the form is always open.)
+const routeToggle = document.getElementById('route-toggle');
+routeToggle.addEventListener('click', function () {
+  const opening = routeToggle.getAttribute('aria-expanded') !== 'true';
+  routeToggle.setAttribute('aria-expanded', String(opening));
+  routeForm.closest('.tools').classList.toggle('route-open', opening);
+  if (opening) {
+    routeFrom.focus();
+  }
+  map.invalidateSize();
+});
 
 document.getElementById('route-use-location').addEventListener('click', function () {
   routeFrom.value = MY_LOCATION;

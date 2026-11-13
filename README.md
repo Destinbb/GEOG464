@@ -80,4 +80,4 @@ Test 6: A neighbourhood where no surveyed segment is in good condition. I search
 
 **My change:** Added a search by Location and locate me option to the search bar, which allows users to input a specific address or locate themselves on the map
 
-**Recheck:** [the same task, given to someone new, with no help. Fixed means: they do it without hesitating at that spot]
+**Recheck:** 

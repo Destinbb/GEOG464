@@ -20,17 +20,82 @@ body {
   color: var(--text);
 }
 
+/* Title and tools on top, map fills the rest of the screen */
 .page {
-  display: grid;
-  grid-template-columns: minmax(280px, 1fr) 2fr;
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   max-width: 1300px;
+  height: 100vh;
   margin: 0 auto;
-  padding: 16px;
+  padding: 12px 16px;
 }
 
-.story {
-  min-width: 0;
+.top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+}
+
+/* Small tabs that open and close the information panels */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tab {
+  padding: 4px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: white;
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.tab:hover {
+  background: #eef2fa;
+}
+
+.tab[aria-expanded="true"] {
+  background: var(--accent);
+  color: white;
+}
+
+.tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* An open panel scrolls inside itself, so the map always keeps most of the screen */
+.tab-panel {
+  max-height: 35vh;
+  overflow-y: auto;
+  padding: 2px 16px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  font-size: 15px;
+}
+
+.tab-panel .lede {
+  font-size: 16px;
+}
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 8px;
 }
 
 h1,
@@ -40,8 +105,8 @@ h2 {
 }
 
 h1 {
-  margin-top: 0;
-  font-size: 30px;
+  margin: 0;
+  font-size: 26px;
 }
 
 h2 {
@@ -66,10 +131,8 @@ a {
   filter: grayscale(100%);
 }
 #map {
-  height: calc(100vh - 32px);
+  flex: 1;
   min-height: 420px;
-  position: sticky;
-  top: 16px;
   width: 100%;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -120,15 +183,22 @@ a {
   font-size: 14px;
 }
 
-#search-form label,
-#route-form label {
+#search-form label {
   display: block;
   margin-bottom: 4px;
 }
 
+/* Route form laid out in one row: Plan a bike route: From [ ] [My location] To [ ] [Plan route] */
+#route-form {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+
 #route-form input {
-  width: 100%;
-  margin-bottom: 6px;
+  width: 220px;
 }
 
 .route-row {
@@ -141,10 +211,15 @@ a {
   min-width: 0;
 }
 
-/* "Locate me" button, stacked above the zoom buttons */
+/* "Locate me" button, next to the route form */
 .locate-control {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 260px;
   background: white;
-  max-width: 220px;
+  border-radius: 4px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
 }
 
 .locate-button {
@@ -162,6 +237,26 @@ a {
 .locate-button:hover,
 .locate-button:focus-visible {
   background: #f1f5f9;
+}
+
+/* "Plan a route" button: hidden on a computer, shown on phones (see the phone rules below) */
+.route-toggle {
+  display: none;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: white;
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.route-toggle[aria-expanded="true"] {
+  background: var(--accent);
+  color: white;
 }
 
 .locate-message {
@@ -200,20 +295,46 @@ a {
 
 @media (max-width: 800px) {
   .page {
-    grid-template-columns: 1fr;
+    height: auto;
   }
 
   #map {
-    order: -1;
-    height: 520px;
+    flex: none;
+    height: 70vh;
     min-height: 420px;
-    position: static;
   }
 
-  /* Search and route forms sit above the map instead of on it */
-  #search-form,
+  /* On a phone the route form stacks: each label on its own line, boxes full width */
+  #route-form label,
+  #route-form .route-row,
+  #route-form input,
+  .route-title {
+    flex-basis: 100%;
+  }
+
+  #route-form input {
+    width: 100%;
+  }
+
+  /* "Plan a route" and "Locate me" share one row; the form opens below them */
+  .route-toggle {
+    display: block;
+    flex: 1;
+  }
+
+  .locate-control {
+    flex: 1;
+    max-width: none;
+  }
+
   #route-form {
-    order: -2;
+    display: none;
+    flex-basis: 100%;
+    order: 3;
+  }
+
+  .tools.route-open #route-form {
+    display: flex;
   }
 
   #search-form .map-hint,
@@ -261,6 +382,17 @@ a {
   margin: 6px 0 0;
   max-width: 220px;
   color: var(--muted);
+}
+
+/* The route message takes its own line under the form, and takes no space when empty */
+#route-form #route-result {
+  flex-basis: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+#route-result:empty {
+  display: none;
 }
 .map-hint {
   margin: 0 0 8px;
