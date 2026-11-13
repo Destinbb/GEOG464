@@ -80,4 +80,12 @@ Test 6: A neighbourhood where no surveyed segment is in good condition. I search
 
 **My change:** Added a search by Location and locate me option to the search bar, which allows users to input a specific address or locate themselves on the map
 
-**Recheck:** 
+**Recheck:** Asked Andre to type in a location for A and a location for B the search retuned:  "5035, Rue de Bellechasse, Rosemont. B: 5481-5483, Avenue Van Horne, Côte-des-Neiges–Notre-Dame-de-Grâce. 12.8 km, about 61 min by bike (black line). The route prefers bike paths but does not pick protected lanes on purpose: blue lines along it are protected". The site also showed the route in a black line with A and B as pins on the map
+
+**Before:**
+
+![Before: the map with only the neighbourhood search](images/before.png)
+
+**After:**
+
+![After: a bike route planned from rue de Bellechasse to avenue Van Horne](images/after.png)
