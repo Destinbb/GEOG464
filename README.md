@@ -71,3 +71,13 @@ Test 6: A neighbourhood where no surveyed segment is in good condition. I search
 | 6. On a phone (size view and my phone) |Fault: Major furthermore mobile optimization to be done | |
 | 7. Mouse in my pocket | Pass| |
 | 8. Accessibility audit |Pass: Lighthouse Accessibility 100 on the live site; no red or orange items. | |
+
+## Part 3: what I found, and one fix
+
+**Evidence:** [In both rounds 1 and 2, the testers tried to find routes by searching by neighbourhood. When no routes were returned, the testers said that it would be much easier if they could locate themsleves on the map and search by location.]
+
+**Severity:** 3, each time the tester tried to indentify routes by typing in their neirborhood, the search returned "No protected routes found" which stoped them from completing the task. Testers had to manually zoom into the neighborhoods to dind routes. 
+
+**My change:** Added a search by Location and locate me option to the search bar, which allows users to input a specific address or locate themselves on the map
+
+**Recheck:** [the same task, given to someone new, with no help. Fixed means: they do it without hesitating at that spot]

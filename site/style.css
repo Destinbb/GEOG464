@@ -111,7 +111,8 @@ a {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
 }
 
-#search-form {
+#search-form,
+#route-form {
   padding: 8px 10px;
   background: white;
   border-radius: 4px;
@@ -119,9 +120,68 @@ a {
   font-size: 14px;
 }
 
-#search-form label {
+#search-form label,
+#route-form label {
   display: block;
   margin-bottom: 4px;
+}
+
+#route-form input {
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.route-row {
+  display: flex;
+  gap: 4px;
+}
+
+.route-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* "Locate me" button, stacked above the zoom buttons */
+.locate-control {
+  background: white;
+  max-width: 220px;
+}
+
+.locate-button {
+  display: block;
+  padding: 6px 10px;
+  border: 0;
+  background: white;
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.locate-button:hover,
+.locate-button:focus-visible {
+  background: #f1f5f9;
+}
+
+.locate-message {
+  margin: 0;
+  padding: 4px 10px 6px;
+  font-size: 13px;
+  color: #9b1c1c;
+}
+
+/* A and B pins at each end of a planned route */
+.route-pin {
+  background: #111827;
+  color: white;
+  border: 2px solid white;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .map-error {
@@ -150,17 +210,21 @@ a {
     position: static;
   }
 
-  /* Search sits above the map instead of on it */
-  #search-form {
+  /* Search and route forms sit above the map instead of on it */
+  #search-form,
+  #route-form {
     order: -2;
   }
 
   #search-form .map-hint,
-  #search-form #search-result {
+  #search-form #search-result,
+  #route-form .map-hint,
+  #route-form #route-result {
     max-width: none;
   }
 
-  #search-input {
+  #search-input,
+  #route-form input {
     font-size: 16px; /* stops iPhone Safari zooming in when the box is tapped */
   }
 
@@ -192,7 +256,8 @@ a {
   display: block;
 }
 
-#search-result {
+#search-result,
+#route-result {
   margin: 6px 0 0;
   max-width: 220px;
   color: var(--muted);

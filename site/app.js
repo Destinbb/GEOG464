@@ -5,6 +5,239 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
+map.attributionControl.addAttribution(
+  'Routing: <a href="https://routing.openstreetmap.de/about.html">FOSSGIS OSRM</a>, ' +
+  'addresses: <a href="https://nominatim.org">Nominatim</a>'
+);
+
+const isPhone = window.innerWidth <= 800;
+
+// ---------- Locate me ----------
+// A rough box around the island of Montreal, used to keep address results on the island
+const ISLAND = { west: -73.98, south: 45.40, east: -73.47, north: 45.71 };
+const myLocationLayer = L.layerGroup().addTo(map);
+let myLocation = null;
+let myLocationMarker = null;
+
+function onIsland(latlng) {
+  return latlng.lng > ISLAND.west && latlng.lng < ISLAND.east &&
+    latlng.lat > ISLAND.south && latlng.lat < ISLAND.north;
+}
+
+// Ask the browser for the reader's position and draw it: a dot, plus a faint circle for its accuracy
+function locateMe() {
+  return new Promise(function (resolve, reject) {
+    if (!navigator.geolocation) {
+      reject(new Error('This browser cannot share your location.'));
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(function (position) {
+      myLocation = L.latLng(position.coords.latitude, position.coords.longitude);
+      const accuracy = Math.round(position.coords.accuracy);
+      myLocationLayer.clearLayers();
+      L.circle(myLocation, {
+        radius: accuracy, color: '#1f2d5a', weight: 1, fillOpacity: 0.1, interactive: false
+      }).addTo(myLocationLayer);
+      myLocationMarker = L.circleMarker(myLocation, {
+        radius: 8, color: '#ffffff', weight: 3, fillColor: '#1f2d5a', fillOpacity: 1
+      }).bindPopup(
+        '<strong>You are here</strong><br>Accurate to about ' + accuracy + ' m.' +
+        (onIsland(myLocation) ? '' : '<br>You seem to be off the island of Montreal; the bike network shown covers the island only.')
+      ).addTo(myLocationLayer);
+      resolve(myLocation);
+    }, function (error) {
+      reject(new Error(error.code === error.PERMISSION_DENIED
+        ? 'Location is blocked. Allow location for this page in your browser settings, then try again.'
+        : 'Your location could not be found. Try again, or type a starting address.'));
+    }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 });
+  });
+}
+
+const locateControl = L.control({ position: 'bottomright' });
+locateControl.onAdd = function () {
+  const div = L.DomUtil.create('div', 'leaflet-bar locate-control');
+  const button = L.DomUtil.create('button', 'locate-button', div);
+  button.type = 'button';
+  button.textContent = 'Locate me';
+  const message = L.DomUtil.create('p', 'locate-message', div);
+  message.setAttribute('role', 'status');
+  message.hidden = true;
+  L.DomEvent.disableClickPropagation(div);
+
+  button.addEventListener('click', function () {
+    button.disabled = true;
+    button.textContent = 'Locating…';
+    message.hidden = true;
+    locateMe()
+      .then(function (latlng) {
+        map.setView(latlng, Math.max(map.getZoom(), 16));
+        myLocationMarker.openPopup();
+      })
+      .catch(function (err) {
+        message.textContent = err.message;
+        message.hidden = false;
+      })
+      .finally(function () {
+        button.disabled = false;
+        button.textContent = 'Locate me';
+      });
+  });
+  return div;
+};
+locateControl.addTo(map);
+
+// ---------- Plan a route from A to B ----------
+// Route line sits in its own pane, above the bike-lane layers, so toggling layers never hides it
+map.createPane('routePane').style.zIndex = 450;
+const routeLayer = L.layerGroup().addTo(map);
+
+// Nominatim reads French street words best, so expand common English forms: "Blvd W" -> "boulevard Ouest"
+function tidyAddress(text) {
+  return text.trim()
+    .replace(/\b(blvd|boul|boulevard)\b\.?/gi, 'boulevard')
+    .replace(/\bave?\b\.?/gi, 'avenue')
+    .replace(/\s+(w|west)\.?$/i, ' Ouest')
+    .replace(/\s+(e|east)\.?$/i, ' Est');
+}
+
+// Turn an address or place name into a point on the island
+function findPlace(text) {
+  const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&bounded=1' +
+    '&viewbox=' + [ISLAND.west, ISLAND.north, ISLAND.east, ISLAND.south].join(',') +
+    '&q=' + encodeURIComponent(tidyAddress(text));
+  return fetch(url)
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error('The address search is not responding. Try again in a minute.');
+      }
+      return response.json();
+    })
+    .then(function (results) {
+      if (results.length === 0) {
+        throw new Error('Could not find "' + text + '" on the island of Montreal. Try a street address, e.g. 4500 rue Saint-Denis.');
+      }
+      // Keep the first part of the long name (e.g. "Marché Atwater, Avenue Greene") so the reader can check the match
+      const name = results[0].display_name.split(', ').slice(0, 3).join(', ');
+      return { latlng: L.latLng(Number(results[0].lat), Number(results[0].lon)), name: name };
+    });
+}
+
+// Ask the OpenStreetMap bike router for a route; it prefers bike paths and quiet streets
+function findBikeRoute(start, end) {
+  const url = 'https://routing.openstreetmap.de/routed-bike/route/v1/bike/' +
+    start.lng + ',' + start.lat + ';' + end.lng + ',' + end.lat +
+    '?overview=full&geometries=geojson';
+  return fetch(url)
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error('The route planner is not responding. Try again in a minute.');
+      }
+      return response.json();
+    })
+    .then(function (result) {
+      if (result.code !== 'Ok' || result.routes.length === 0) {
+        throw new Error('No bike route was found between these two places.');
+      }
+      return result.routes[0];
+    });
+}
+
+function routePin(label) {
+  return L.divIcon({ className: 'route-pin', html: label, iconSize: [24, 24] });
+}
+
+const routeForm = document.getElementById('route-form');
+const routeFrom = document.getElementById('route-from');
+const routeTo = document.getElementById('route-to');
+const routeResult = document.getElementById('route-result');
+const MY_LOCATION = 'My location';
+
+// Put the route form on the map (top left) on a computer, or just above the map on a phone
+if (isPhone) {
+  const mapElement = document.getElementById('map');
+  mapElement.parentNode.insertBefore(routeForm, mapElement);
+} else {
+  const routeControl = L.control({ position: 'topleft' });
+  routeControl.onAdd = function () {
+    L.DomEvent.disableClickPropagation(routeForm);
+    L.DomEvent.disableScrollPropagation(routeForm);
+    return routeForm;
+  };
+  routeControl.addTo(map);
+}
+
+document.getElementById('route-use-location').addEventListener('click', function () {
+  routeFrom.value = MY_LOCATION;
+  routeResult.textContent = 'Finding your location…';
+  locateMe()
+    .then(function () {
+      routeResult.textContent = 'Start set to your location. Now type where you want to go.';
+      routeTo.focus();
+    })
+    .catch(function (err) {
+      routeFrom.value = '';
+      routeResult.textContent = err.message;
+    });
+});
+
+routeForm.addEventListener('submit', function (event) {
+  event.preventDefault();
+  const fromText = routeFrom.value.trim();
+  const toText = routeTo.value.trim();
+  if (fromText === '' || toText === '') {
+    routeResult.textContent = 'Type a start and an end address, or press "My location" for the start.';
+    return;
+  }
+
+  const submitButton = routeForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  routeResult.textContent = 'Planning your route…';
+
+  const startPlace = fromText.toLowerCase() === MY_LOCATION.toLowerCase()
+    ? (myLocation ? Promise.resolve(myLocation) : locateMe()).then(function (latlng) {
+      return { latlng: latlng, name: 'your location' };
+    })
+    : findPlace(fromText);
+
+  // Nominatim asks for no more than one request per second, so look up the end after the start
+  startPlace
+    .then(function (start) {
+      return new Promise(function (resolve) { setTimeout(resolve, 1000); })
+        .then(function () { return findPlace(toText); })
+        .then(function (end) { return [start, end]; });
+    })
+    .then(function ([start, end]) {
+      return findBikeRoute(start.latlng, end.latlng).then(function (route) {
+        return [start, end, route];
+      });
+    })
+    .then(function ([start, end, route]) {
+      routeLayer.clearLayers();
+      // White casing under a dark line so the route stands out from the blue and pink lanes
+      L.geoJSON(route.geometry, {
+        pane: 'routePane', interactive: false, style: { color: '#ffffff', weight: 9, opacity: 0.9 }
+      }).addTo(routeLayer);
+      const line = L.geoJSON(route.geometry, {
+        pane: 'routePane', interactive: false, style: { color: '#111827', weight: 5, opacity: 0.9 }
+      }).addTo(routeLayer);
+      L.marker(start.latlng, { icon: routePin('A'), title: 'Start: ' + start.name }).addTo(routeLayer);
+      L.marker(end.latlng, { icon: routePin('B'), title: 'End: ' + end.name }).addTo(routeLayer);
+      map.fitBounds(line.getBounds().pad(0.1));
+
+      const km = (route.distance / 1000).toFixed(1);
+      const minutes = Math.max(1, Math.round(route.duration / 60));
+      routeResult.textContent =
+        'A: ' + start.name + '. B: ' + end.name + '. ' +
+        km + ' km, about ' + minutes + ' min by bike (black line). ' +
+        'The route prefers bike paths but does not pick protected lanes on purpose: blue lines along it are protected.';
+    })
+    .catch(function (err) {
+      routeResult.textContent = err.message;
+    })
+    .finally(function () {
+      submitButton.disabled = false;
+    });
+});
 
 const colours = {
   Yes: '#2166ac',
@@ -168,7 +401,6 @@ Promise.all([
       overlays['<span class="layer-swatch repair"></span>Bike repair stations'] = repairLayer;
     }
     // Collapse the layer list into an icon on phones so it doesn't cover the map
-    const isPhone = window.innerWidth <= 800;
     L.control.layers(null, overlays, { collapsed: isPhone }).addTo(map);
 
     // On phones the legend goes bottom-left so it doesn't stack on top of the zoom buttons

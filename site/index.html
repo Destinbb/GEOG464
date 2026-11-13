@@ -14,12 +14,12 @@
         <h1>Montreal: Bicycle Network</h1>
         <p class="lede">Bicycle commuting offers a relatively low-cost, healthy and environmentally friendly alternative to motorized transportation. However, for people who are new to cycling or unfamiliar with Montreal, navigating the city's cycling infrastructure can be intimidating. Futhermore, protected bike routes that offer a phyiscal barrier between the bike lane and vehicle traffic can provide a safer commuting experience. Understanding where bike routes are located and which types of infrastructure they offer can help people make more informed decisions about their commute.</p>
         <p><strong>This map is for:</strong> Cyclists in Montreal who may not be familiar with the city's bike-lane infrastructure.</p>
-        <p><strong>What you can do here:</strong>Click a road segment to see its details. Compare protected and unprotected bike routes by toggling the visibility of each layer. Popup information for each segment explains its type, area, protection status, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
+        <p><strong>What you can do here:</strong> Press <strong>Locate me</strong> to see where you are on the map, or type a start and end address to plan a bike route from A to B. Click a road segment to see its details. Compare protected and unprotected bike routes by toggling the visibility of each layer. Popup information for each segment explains its type, area, protection status, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
         <section>
       </section>
       <section> 
         <h3>How AI was used</h3>
-        <p> I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from Données Québec's open-data portal. I used the agent to filter the scope of the data by only keeping features where VILLE_MTL = Oui. I also used the agent to remove features with missing geometry or required fields, count the exclusions and translate the selected property keys from French to English for the map. Finally I used the agent to split the data into protected and unprotected layers. I reviewed the filtered GeoJSON and made sure that only routes within the city limits and with required fields were displayed on the map. I also checked that the English translations preserved the meaning of the original values. Finally, I confirmed that all segments were correctly classified into the protected and unprotected layers, and were displayed correctly on the map. I also tested the page by toggling the visibility of each layer and opening the popups to ensure they displayed the feature information.</p>
+        <p> I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from Données Québec's open-data portal. I used the agent to filter the scope of the data by only keeping features where VILLE_MTL = Oui. I later used Claude Code to widen this to every route on the island of Montreal, including the linked municipalities such as Westmount and Dorval. I also used the agent to remove features with missing geometry or required fields, count the exclusions and translate the selected property keys from French to English for the map. Finally I used the agent to split the data into protected and unprotected layers. I reviewed the filtered GeoJSON and made sure that only routes on the island of Montreal and with required fields were displayed on the map. I also checked that the English translations preserved the meaning of the original values. Finally, I confirmed that all segments were correctly classified into the protected and unprotected layers, and were displayed correctly on the map. I also tested the page by toggling the visibility of each layer and opening the popups to ensure they displayed the feature information.</p>
       </section>
       <section>
         <h2>Montreal Bicycle Network </h2>
@@ -28,8 +28,8 @@
             <a href="https://www.donneesquebec.ca/recherche/dataset/vmtl-pistes-cyclables">Réseau cyclable</a>,
               City of Montréal, licensed under
             <a href="https://www.donneesquebec.ca/licence/#cc-by">CC BY 4.0</a>.
-            Accessed October 1, 2026. For this MVP, I kept features marked as being
-            within the City of Montréal, removed records with missing geometry or
+            Accessed October 1, 2026. For this MVP, I kept every route on the island of Montréal
+            (the City of Montréal's boroughs and the linked municipalities), removed records with missing geometry or
             required fields, and kept the geometry plus selected properties. I renamed
             those property keys in English but the source values themselves remain unchanged.
           </li>
@@ -46,11 +46,30 @@
             PCI score and survey date to the bike network by street segment (ID_TRC), and the
             pavement layer shows only the bike routes that matched a survey record.
           </li>
+          <li>
+            Route planning: addresses are found with <a href="https://nominatim.org">Nominatim</a> and bike routes come from
+            the <a href="https://routing.openstreetmap.de/about.html">FOSSGIS OSRM bike routing server</a>, both using
+            <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> data. The addresses you type (and your location,
+            if you choose "My location") are sent to these services to plan the route. "Locate me" uses your browser's location
+            and does not send it anywhere.
+          </li>
        </ul>
         
 
 
       </section>
+        <form id="route-form">
+          <p class="map-hint"><strong>Plan a bike route from A to B</strong></p>
+          <label for="route-from">From</label>
+          <div class="route-row">
+            <input id="route-from" type="text" placeholder="e.g. 4500 rue Saint-Denis" autocomplete="off" />
+            <button id="route-use-location" type="button">My location</button>
+          </div>
+          <label for="route-to">To</label>
+          <input id="route-to" type="text" placeholder="e.g. Atwater Market" autocomplete="off" />
+          <button type="submit">Plan route</button>
+          <p id="route-result" aria-live="polite"></p>
+        </form>
         <form id="search-form">
           <p class="map-hint"><strong>Click any route</strong> for its details. Turn on <strong>Pavement condition</strong> (top right) to see road quality.</p>
           <label for="search-input">Find protected routes in a neighbourhood:</label>
