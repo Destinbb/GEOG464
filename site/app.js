@@ -110,8 +110,11 @@ function tidyAddress(text) {
 }
 
 // Turn an address or place name into a point on the island
+// Downtown Montreal (Place Ville Marie), used to break ties between places with the same name
+const DOWNTOWN = L.latLng(45.5017, -73.5673);
+
 function findPlace(text) {
-  const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&bounded=1' +
+  const url = 'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&bounded=1' +
     '&viewbox=' + [ISLAND.west, ISLAND.north, ISLAND.east, ISLAND.south].join(',') +
     '&q=' + encodeURIComponent(tidyAddress(text));
   return fetch(url)
@@ -125,9 +128,20 @@ function findPlace(text) {
       if (results.length === 0) {
         throw new Error('Could not find "' + text + '" on the island of Montreal. Try a street address, e.g. 4500 rue Saint-Denis.');
       }
+      // Some names match several places equally well, e.g. "McGill University" finds both the downtown
+      // campus and the Macdonald campus in Sainte-Anne-de-Bellevue with the same score.
+      // Among the matches that tie with the best one, take the one closest to downtown.
+      const tied = results.filter(function (result) {
+        return Math.abs(result.importance - results[0].importance) < 0.001;
+      });
+      const best = tied.reduce(function (closest, result) {
+        const distance = DOWNTOWN.distanceTo([Number(result.lat), Number(result.lon)]);
+        return distance < closest.distance ? { result: result, distance: distance } : closest;
+      }, { result: results[0], distance: Infinity }).result;
+
       // Keep the first part of the long name (e.g. "Marché Atwater, Avenue Greene") so the reader can check the match
-      const name = results[0].display_name.split(', ').slice(0, 3).join(', ');
-      return { latlng: L.latLng(Number(results[0].lat), Number(results[0].lon)), name: name };
+      const name = best.display_name.split(', ').slice(0, 3).join(', ');
+      return { latlng: L.latLng(Number(best.lat), Number(best.lon)), name: name };
     });
 }
 
