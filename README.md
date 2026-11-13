@@ -34,6 +34,28 @@ After adding my second data layer, I feel like I really have to work on the core
 How AI was used
 I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from Données Québec's open-data portal. I filtered the data to include only features where VILLE_MTL = Oui, removed features with missing geometry or required fields, counted exclusions, and translated selected property keys from French to English. I also used the agent to separate protected and unprotected bike routes. I reviewed the filtered data to verify that routes were within Montréal, the translations preserved the original meaning, and segments were correctly classified.
 
+### Later AI use (added November 13, 2026)
+I later used Claude Code (Claude Opus 5.5) to widen the data filter from VILLE_MTL = Oui to every route on the island of Montreal, including the linked municipalities such as Westmount and Dorval, and to update the notebook's checks and counts.
+
+After usability testing showed that readers struggled to find themselves on the map and had no way to plan a trip, I used Claude Code to add a "Locate me" button (using the browser's location) and an A-to-B route planner that looks up addresses with Nominatim and gets a bike route from the FOSSGIS OSRM server, both using OpenStreetMap data. Claude Code tested both features in a headless browser at computer and phone width, and checked that the existing layers and neighbourhood search still worked.
+
+### A3 AI disclosure (process)
+Bue Lane
+
+**Tool and model:** [Part 1, the pavement join in the notebook (committed October 30): name the tool and model you used, or write "no AI" if you did it yourself. My README says I used GitHub Copilot with gpt-6-luna for the data cleaning.] Part 2, the pavement summary in the neighbourhood search (November 7): Claude Code with Claude Opus 5.5; those commits are marked "Co-Authored-By: Claude Opus 5.5".
+
+**What I asked:** [In your own words. For example: for part 1, how to join the pavement CSV to the bike lanes by ID_TRC; for part 2, to make the neighbourhood search report pavement condition for the borough's protected lanes, using tests 4–6 as the target.]
+
+**What came back:**
+- Part 1: [what the tool gave you for the join, if you used one]
+- Part 2: code that counts a borough's protected segments with a pavement record and the share in good or excellent condition. It leaves segments with no record out of the count instead of treating them as bad, and says "None have a pavement survey record" when there are none. It also made bike lane lines thicker on hover.
+
+**What I kept or changed, and why:** [Your decisions. For example: you kept missing pavement data out of the score so readers don't mistake it for poor roads (your edge case), and you kept the rating describing the street, not the bike-lane surface.]
+
+**How my tests checked it:** I wrote tests 1–3 before any code (commit "A3 card and three tests, before any code", October 30), and tests 4–6 before the search-summary code (November 7; that commit was co-authored with Claude Code). Test 3, the edge case, checks that a route with no pavement match stays blue with its normal popup and no PCI score. Tests 4–6 check exact numbers for Verdun (277 / 167 / 69, 41%), Ville-Marie (263 / 226 / 61, 27%) and Pierrefonds-Roxboro (17 / 9 / 0, 0%). The Pierrefonds test checks that the page reports 0 out of 9 surveyed rather than "no data". [Say how you ran them and what you saw.]
+
+**What stayed mine:** [For example: choosing the pavement dataset and the ID_TRC join, the A3 card, the edge case and the decision that missing data is never shown as a score, test 3's example (Île-des-Sœurs), and checking each result on the map.]
+
 # B5:
 
 # A3 feature: Pavement Condition Index
@@ -59,6 +81,19 @@ Test 5: I search "ville marie".
 -Expected: "263 protected segments in Ville-Marie. 226 have a pavement survey record; 61 of those (27%) are in good or excellent condition."
 Test 6: A neighbourhood where no surveyed segment is in good condition. I search "Pierrefonds".
 -Expected: "17 protected segments in Pierrefonds-Roxboro. 9 have a pavement survey record; 0 of those (0%) are in good or excellent condition." The page says 0 out of 9 surveyed, not "no data", and there are no console errors.
+
+## A3 feature: how the code works
+
+Line numbers are for `site/app.js` and the notebook as of November 13, 2026.
+
+| Lines | What they do |
+| --- | --- |
+| Notebook cells 13–18 (`notebooks/TermProject.ipynb`) | [Joins the pavement CSV to the bike lanes by ID_TRC and writes `bike_lanes_with_pavement.geojson`. Joins the 2 data layer by they're shared ID_TRC |
+| [site/app.js:269-286](site/app.js#L269-L286) | [Pavement colours, English names for the French condition categories, and `colourForPavement`. Translates french condition category names to english and assigns a colour to each of the 5 levels of pavement conditions |
+| [site/app.js:372-388](site/app.js#L372-L388) | The pavement layer: line colour from the condition, and the popup with PCI score and survey date. Popups show condition of the survyed pavement and give PCI score, with 0 being the worst and 100 being the best |
+| [site/app.js:429-459](site/app.js#L429-L459) | The pavement legend, shown only while the pavement layer is on. Only displays the pavement layer when the toggle is turned onn
+| [site/app.js:533-551](site/app.js#L533-L551) | The pavement summary in the neighbourhood search. Gives a summary of the total number of streets surveyd in the neighborhood and gives the % streets that have a good or excellent condition 
+**One thing I do not yet fully understand:** how I can display the Pavement data alongside the protected routes without the 2 covering each other 
 
  ## Pre-flight report (Lab 7)
 | Check | Result | What I did |
