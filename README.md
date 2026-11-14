@@ -1,76 +1,83 @@
 # Montreal Bike Lanes
 
-[Link to the site](/site)
+[Link to the site](https://destinbb.github.io/GEOG464/site/)
 
 ## The five sentences
 
 1. **Problem:** People commuting by bike in Montréal may not know what cycling infrastructure is available across the city, making it harder to understand the potential route options.
 2. **Audience:** This map is for cyclists in Montreal who want to explore the city's bicycle network by area and facility type.
-3. **Core action:** Toggle the protected and not-identified as protected layers, then click a segment to inspect its type, area, protection status, year-round status, and recorded length.
-4. **Boundary:** This iteration includes facilities marked as within the City of Montreal and does not provide routing, surface-condition, closure, or safety assessments.
-5. **Data:** The map uses Montreal Open Data's continuously updated "Reseau cyclable" GeoJSON, read and narrowed in the project notebook to city records with usable line geometry and required descriptive fields. :https://www.donneesquebec.ca/recherche/dataset/vmtl-pistes-cyclables/resource/0dc6612a-be66-406b-b2d9-59c9e1c65ebf. City of Montréal, licensed under CC BY 4.0, accessed October 1, 2026. The notebook rounds coordinates to 5 decimal places (about 1 m) and writes compact JSON, which brought the cleaned file from 5.44 MB to 3.60 MB (under the 5 MB guide) and the pavement file from 3.43 MB to 2.58 MB, so the map loads faster on a phone. The feature counts did not change (8,245 bike segments, 5,245 with pavement).
+3. **Core action:** Toggle the protected and not-identified as protected layers, then click a segment to inspect its type, area, protection status, year-round status, and recorded length. Locate yourself on the map or plan a route from A to B
+4. **Boundary:** 
+5. **Data:** The map uses Montreal Open Data's continuously updated "Réseau cyclable" GeoJSON, read and narrowed in the project notebook to records on the island of Montreal with usable line geometry and required descriptive fields. :https://www.donneesquebec.ca/recherche/dataset/vmtl-pistes-cyclables/resource/0dc6612a-be66-406b-b2d9-59c9e1c65ebf. City of Montréal, licensed under CC BY 4.0, accessed October 1, 2026. The notebook rounds coordinates to 5 decimal places (about 1 m) and writes compact JSON, which brought the cleaned file from 5.44 MB to 3.60 MB (under the 5 MB guide) and the pavement file from 3.43 MB to 2.58 MB, so the map loads faster on a phone. Rounding did not change the feature counts. Since widening the data to every route on the island of Montreal, the cleaned file has 9,483 bike segments (4.19 MB) and the pavement file has 5,248 (2.58 MB).
 6. ## A3 data: 
-the pavement layer uses ([Indicateurs de condition des chaussées du réseau routier]), published by the City of Montréal ([https://donnees.montreal.ca/dataset/condition-chaussees-reseau-routier#additional-info]), licensed under Creative Commons Attribution 4.0 International. Accessed October 23, 2026. I joined the pavement PCI condition catergory, score and survey date to bike-network GeoJSON using ID_TRC, and only included matched records in the pavement overlay (5,245 street segments). These ratings describe surveyed street segments but may not represent the bike-lane surface itself.
+The pavement layer uses ([Indicateurs de condition des chaussées du réseau routier]), published by the City of Montréal ([https://donnees.montreal.ca/dataset/condition-chaussees-reseau-routier#additional-info]), licensed under Creative Commons Attribution 4.0 International. Accessed October 23, 2026. I joined the pavement PCI condition category, score and survey date to bike-network GeoJSON using ID_TRC, and only included matched records in the pavement overlay (5,248 street segments). These ratings describe surveyed street segments but may not represent the bike-lane surface itself.
 
 ## Bike repair stations data:
 The repair stations layer uses bicycle repair station points from OpenStreetMap (https://www.openstreetmap.org), © OpenStreetMap contributors, licensed under the Open Database License (ODbL) (https://www.openstreetmap.org/copyright). Downloaded with Overpass Turbo (https://overpass-turbo.eu) using the query `node["amenity"="bicycle_repair_station"]` within the City of Montréal boundary (`admin_level=8`), and exported as GeoJSON to `data/repair_stations.geojson`. Accessed November 2, 2026. The file has 87 stations. I did not edit the data; the map shows each station's air pump, tools, opening hours and operator, and shows "not recorded" when a station has no value (only 27 of 87 list opening hours). OpenStreetMap is mapped by volunteers, so some stations may be missing, moved or out of service.
 
 
 ## AFTER Demo
-At my demo I felt like my site desciption could have been a bit more descriptive into what you can actully do with the wesbite. 
-After adding my second data layer, I feel like I really have to work on the core action of my website and add more usability features so a real user could actually plan a route based on their prefered parameters.  
+At my demo I felt like my site description could have been a bit more descriptive into what you can actually do with the website. 
+After adding my second data layer, I feel like I really have to work on the core action of my website and add more usability features so a real user could actually plan a route based on their preferred parameters.  
 ## My neighbours 5 second answers: 
 "This map is about the Montreal bicycle network. It maps different bike lanes based on whether they are physically protected from cars or not. It always maps the pavement condition of each route based on its Pavement Condition Index or PCI. Blue represents the network's protected routes while dark red represents the network's unprotected routes. For the pavement layer, the darkest colours represent the poorest pavement condition while the lightest represent the best" --- Thanks Lukas
 
 
 ## Run the MVP
 
-1. Open the `TermProj` folder in VS Code.
+1. Open the `GEOG464` folder in VS Code.
 2. Open `notebooks/TermProject.ipynb` and run every cell from top to bottom. It reads the raw GeoJSON, reports exclusions, rounds coordinates to 5 decimals, writes `bike_lanes_clean_english.geojson`, and finishes with count, geometry-extent, geometry-type, property and file-size (under 5 MB) checks.
 3. Right-click `site/index.html` and choose **Open with Live Server**. The page fetches the notebook output from `../data/bike_lanes_clean_english.geojson`
 4. Use the map layer checkboxes to show or hide protected lanes. Click a line for its attributes.
 
-## How AI was used - Guided (blue) lane
+## How AI was used - green lane
 How AI was used
 I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from Données Québec's open-data portal. I filtered the data to include only features where VILLE_MTL = Oui, removed features with missing geometry or required fields, counted exclusions, and translated selected property keys from French to English. I also used the agent to separate protected and unprotected bike routes. I reviewed the filtered data to verify that routes were within Montréal, the translations preserved the original meaning, and segments were correctly classified.
 
-### Later AI use (added November 13, 2026)
+### Later AI use (since October 30th) blue lane
 I later used Claude Code (Claude Opus 5.5) to widen the data filter from VILLE_MTL = Oui to every route on the island of Montreal, including the linked municipalities such as Westmount and Dorval, and to update the notebook's checks and counts.
 
 After usability testing showed that readers struggled to find themselves on the map and had no way to plan a trip, I used Claude Code to add a "Locate me" button (using the browser's location) and an A-to-B route planner that looks up addresses with Nominatim and gets a bike route from the FOSSGIS OSRM server, both using OpenStreetMap data. Claude Code tested both features in a headless browser at computer and phone width, and checked that the existing layers and neighbourhood search still worked.
 
 ### A3 AI disclosure (process)
-Bue Lane
+Blue Lane
 
-**Tool and model:** [Part 1, the pavement join in the notebook (committed October 30): name the tool and model you used, or write "no AI" if you did it yourself. My README says I used GitHub Copilot with gpt-6-luna for the data cleaning.] Part 2, the pavement summary in the neighbourhood search (November 7): Claude Code with Claude Opus 5.5; those commits are marked "Co-Authored-By: Claude Opus 5.5".
+**Tool and model:**  Claude Opus 5.5 
 
-**What I asked:** [In your own words. For example: for part 1, how to join the pavement CSV to the bike lanes by ID_TRC; for part 2, to make the neighbourhood search report pavement condition for the borough's protected lanes, using tests 4–6 as the target.]
+**What I asked:** 
+1) I asked Claude to join the pavement CSV to the bike lanes by their shared ID_TRC and translate all French names to English
+2) I asked Claude to add popups for each segment that show the road's quality and PCI rating and a layer toggle that allows the layer to be turned on and off
+3) I asked Claude to make the neighbourhood search report pavement condition for the borough's protected lanes, using tests 4–6 as the target
 
 **What came back:**
-- Part 1: [what the tool gave you for the join, if you used one]
-- Part 2: code that counts a borough's protected segments with a pavement record and the share in good or excellent condition. It leaves segments with no record out of the count instead of treating them as bad, and says "None have a pavement survey record" when there are none. It also made bike lane lines thicker on hover.
+1) Claude returned a new "bike_lanes_with_pavement.geojson" file 
+2) Claude added popup windows to the pavement layer and added a layer toggle to the legend box
+3) Claude added code to count borough's protected segments with a pavement record and the share in good or excellent condition. It leaves segments with no record out of the count instead of treating them as bad, and says "None have a pavement survey record" when there are none. It also made bike lane lines thicker on hover.
 
-**What I kept or changed, and why:** [Your decisions. For example: you kept missing pavement data out of the score so readers don't mistake it for poor roads (your edge case), and you kept the rating describing the street, not the bike-lane surface.]
+**What I kept or changed, and why:** 
+I kept missing pavement data out of the score so readers don't mistake it for poor roads and the % rating  describing the street, not the bike-lane surface. 
+Changed McGill location to downtown, as prior searches brought you to the West Island location 
 
-**How my tests checked it:** I wrote tests 1–3 before any code (commit "A3 card and three tests, before any code", October 30), and tests 4–6 before the search-summary code (November 7; that commit was co-authored with Claude Code). Test 3, the edge case, checks that a route with no pavement match stays blue with its normal popup and no PCI score. Tests 4–6 check exact numbers for Verdun (277 / 167 / 69, 41%), Ville-Marie (263 / 226 / 61, 27%) and Pierrefonds-Roxboro (17 / 9 / 0, 0%). The Pierrefonds test checks that the page reports 0 out of 9 surveyed rather than "no data". [Say how you ran them and what you saw.]
+**How my tests checked it:** I wrote tests 1–3 before any code (commit "A3 card and three tests, before any code", October 30), and tests 4–6 before the search-summary code (November 7; that commit was co-authored with Claude Code). Test 3, the edge case, checks that a route with no pavement match stays blue with its normal popup and no PCI score. Tests 4–6 check exact numbers for Verdun (277 / 167 / 69, 41%), Ville-Marie (263 / 226 / 61, 27%) and Pierrefonds-Roxboro (17 / 9 / 0, 0%). The Pierrefonds test checks that the page reports 0 out of 9 surveyed rather than "no data". 
 
-**What stayed mine:** [For example: choosing the pavement dataset and the ID_TRC join, the A3 card, the edge case and the decision that missing data is never shown as a score, test 3's example (Île-des-Sœurs), and checking each result on the map.]
+**What stayed mine:**
+I chose the pavement dataset and the ID_TRC join, the A3 card, the edge case and the decision that missing data is never shown as a score, test 3's example (Île-des-Sœurs), and checking each result on the map. I also decied to add a locate me feature and A to B route planning. I decided to restructure the page layout to show less information and put the locate me and A to B planning at the top of the site. 
 
 # B5:
 
 # A3 feature: Pavement Condition Index
-for A3 I added the Pavement Condition Index so my reader can see the road condition of each potential bike route. 
+For A3 I added the Pavement Condition Index so my reader can see the road condition of each potential bike route. 
 It has depth because it displays the pavement condition of specific roads in Montreal. 
-I will know it works when: I can turn on the pavement layer switcher and examine each road segment based on it's PCI rating. 
+I will know it works when: I can turn on the pavement layer switcher and examine each road segment based on its PCI rating. 
 My edge case is a bicycle route segment with no matching pavement condition record. Since the bicycle network and pavement condition datasets are separate sources joined using ID_TRC, not every bicycle route necessarily has corresponding pavement information. The bicycle route should remain visible on the map with its normal popup, and no pavement line should be drawn for it. Missing data is never shown as a score, so readers won't mistake it for poor road conditions.
 
 
 # Tests
 Test 1: turn on the layer switcher for PCI in the legend
--Expected: PCI layer loads and displays the roads pavement condition rating 
+-Expected: PCI layer loads and displays the road's pavement condition rating 
 Test 2: Click a segment of road to view its pavement condition
--Expected: the pop-up opens and displays the segments PCI score and rating 
-Test 3: A bike route with no pavement match. With the pavement layer on, I zoom in and find any protected route that still displays as blue. It has no record in the pavement survey, either because its ID_TRC is 0 (187 protected routes) or because its ID_TRC is not in the survey (468 protected routes). Example: the dedicated path at the south tip of Île-des-Sœurs, Verdun, which has ID_TRC 0.
+-Expected: the pop-up opens and displays the segment's PCI score and rating 
+Test 3: A bike route with no pavement match. With the pavement layer on, I zoom in and find any protected route that still displays as blue. It has no record in the pavement survey, either because its ID_TRC is 0 (189 protected routes) or because its ID_TRC is not in the survey (484 protected routes). Example: the dedicated path at the south tip of Île-des-Sœurs, Verdun, which has ID_TRC 0.
 -Expected: the path stays blue with no pavement colour over it, the normal popup opens with no PCI score, and no errors come from app.js
 -Result: PCI layer is not displayed over Île-des-Sœurs route, but popup still displays route information
 
@@ -88,11 +95,12 @@ Line numbers are for `site/app.js` and the notebook as of November 13, 2026.
 
 | Lines | What they do |
 | --- | --- |
-| Notebook cells 13–18 (`notebooks/TermProject.ipynb`) | [Joins the pavement CSV to the bike lanes by ID_TRC and writes `bike_lanes_with_pavement.geojson`. Joins the 2 data layer by they're shared ID_TRC |
-| [site/app.js:269-286](site/app.js#L269-L286) | [Pavement colours, English names for the French condition categories, and `colourForPavement`. Translates french condition category names to english and assigns a colour to each of the 5 levels of pavement conditions |
-| [site/app.js:372-388](site/app.js#L372-L388) | The pavement layer: line colour from the condition, and the popup with PCI score and survey date. Popups show condition of the survyed pavement and give PCI score, with 0 being the worst and 100 being the best |
-| [site/app.js:429-459](site/app.js#L429-L459) | The pavement legend, shown only while the pavement layer is on. Only displays the pavement layer when the toggle is turned onn
-| [site/app.js:533-551](site/app.js#L533-L551) | The pavement summary in the neighbourhood search. Gives a summary of the total number of streets surveyd in the neighborhood and gives the % streets that have a good or excellent condition 
+| Notebook cells 13–18 (`notebooks/TermProject.ipynb`) | Joins the pavement CSV to the bike lanes by ID_TRC and writes `bike_lanes_with_pavement.geojson`. Joins the 2 data layers by their shared ID_TRC |
+| [site/app.js:269-286](site/app.js#L269-L286) | Pavement colours, English names for the French condition categories, and `colourForPavement`. Translates French condition category names to English and assigns a colour to each of the 5 levels of pavement conditions |
+| [site/app.js:372-388](site/app.js#L372-L388) | The pavement layer: line colour from the condition, and the popup with PCI score and survey date. Popups show condition of the surveyed pavement and give PCI score, with 0 being the worst and 100 being the best |
+| [site/app.js:429-459](site/app.js#L429-L459) | The pavement legend, shown only while the pavement layer is on. Only displays the pavement layer when the toggle is turned on
+| [site/app.js:533-551](site/app.js#L533-L551) | The pavement summary in the neighbourhood search. Gives a summary of the total number of streets surveyed in the neighbourhood and gives the % of streets that have a good or excellent condition 
+
 **One thing I do not yet fully understand:** how I can display the Pavement data alongside the protected routes without the 2 covering each other 
 
  ## Pre-flight report (Lab 7)
@@ -102,20 +110,20 @@ Line numbers are for `site/app.js` and the notebook as of November 13, 2026.
 | 2. Read every label| Pass| |
 | 3. Ask twice |Fault:typing "l" said "2088 protected segments in Ahuntsic-Cartierville" (that borough has 311); "la" said "887 in Saint-Laurent" (it has 30); "le" said "1433 in Ahuntsic-Cartierville". The map zoomed out to several boroughs at once. A partial name matches many boroughs, but the message names only the first. | fixed in commit: Search lists matching boroughs instead of a mixed count: when a search matches more than one borough, the box lists them and asks the reader to type more, and the map doesn't move. Retested: "la" lists 6 boroughs; "Verdun" says 277|
 | 4. The edge | Fault:(a) an empty search said "No protected routes found for ". (b) Only the exact hyphenated spelling "Montreal-nord" worked: "montreal nord" and "plateau mont royal" said "No protected routes found", although those boroughs have 40 and 201. |fixed in commit "Search ignores hyphens, spaces and apostrophes": "montreal nord", "plateau mont royal" and "cote des neiges" now find their boroughs. Retested on the live site.
-| 5. The data does not come | Fault:fault: with bike_lanes_clean_english.geojson blocked, the map showed with no data and no message nearby. The only message was in the status line at the bottom of the text column, and it told the reader to "Open the console (F12)". The search box was still there, and pressing Search reloaded the page. | fixed in commit by adding catch: "Show data-load error on the map and hide search": a plain-language message now appears on the map and the search box is hidden. Retested by blocking the file again.|
-| 6. On a phone (size view and my phone) |Fault: Major furthermore mobile optimization to be done | |
+| 5. The data does not come | Fault: with bike_lanes_clean_english.geojson blocked, the map showed with no data and no message nearby. The only message was in the status line at the bottom of the text column, and it told the reader to "Open the console (F12)". The search box was still there, and pressing Search reloaded the page. | fixed in commit by adding catch: "Show data-load error on the map and hide search": a plain-language message now appears on the map and the search box is hidden. Retested by blocking the file again.|
+| 6. On a phone (size view and my phone) |Fault: Major further mobile optimization to be done | |
 | 7. Mouse in my pocket | Pass| |
 | 8. Accessibility audit |Pass: Lighthouse Accessibility 100 on the live site; no red or orange items. | |
 
 ## Part 3: what I found, and one fix
 
-**Evidence:** [In both rounds 1 and 2, the testers tried to find routes by searching by neighbourhood. When no routes were returned, the testers said that it would be much easier if they could locate themsleves on the map and search by location.]
+**Evidence:** In both rounds 1 and 2, the testers tried to find routes by searching by neighbourhood. When no routes were returned, the testers said that it would be much easier if they could locate themselves on the map and search by location.
 
-**Severity:** 3, each time the tester tried to indentify routes by typing in their neirborhood, the search returned "No protected routes found" which stoped them from completing the task. Testers had to manually zoom into the neighborhoods to dind routes. 
+**Severity:** 3, each time the tester tried to identify routes by typing in their neighbourhood, the search returned "No protected routes found" which stopped them from completing the task. Testers had to manually zoom into the neighbourhoods to find routes. 
 
 **My change:** Added a search by Location and locate me option to the search bar, which allows users to input a specific address or locate themselves on the map
 
-**Recheck:** Asked Andre to type in a location for A and a location for B the search retuned:  "5035, Rue de Bellechasse, Rosemont. B: 5481-5483, Avenue Van Horne, Côte-des-Neiges–Notre-Dame-de-Grâce. 12.8 km, about 61 min by bike (black line). The route prefers bike paths but does not pick protected lanes on purpose: blue lines along it are protected". The site also showed the route in a black line with A and B as pins on the map
+**Recheck:** Asked Andre to type in a location for A and a location for B the search returned:  "5035, Rue de Bellechasse, Rosemont. B: 5481-5483, Avenue Van Horne, Côte-des-Neiges–Notre-Dame-de-Grâce. 12.8 km, about 61 min by bike (black line). The route prefers bike paths but does not pick protected lanes on purpose: blue lines along it are protected". The site also showed the route in a black line with A and B as pins on the map
 
 **Before:**
 
