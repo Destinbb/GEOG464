@@ -175,6 +175,23 @@ const routeTo = document.getElementById('route-to');
 const routeResult = document.getElementById('route-result');
 const MY_LOCATION = 'My location';
 
+// × buttons in the From and To boxes: show one only when its box has text.
+// Pressing it empties the box and removes the planned route, since the route no longer matches.
+document.querySelectorAll('.clear-button').forEach(function (button) {
+  const input = document.getElementById(button.dataset.clears);
+  function showButton() {
+    button.hidden = input.value === '';
+  }
+  input.addEventListener('input', showButton);
+  button.addEventListener('click', function () {
+    input.value = '';
+    showButton();
+    routeLayer.clearLayers();
+    routeResult.textContent = '';
+    input.focus();
+  });
+});
+
 // On phones the route form is folded up; the "Plan a route" button opens and closes it.
 // (On a computer the button is hidden by CSS and the form is always open.)
 const routeToggle = document.getElementById('route-toggle');
@@ -190,6 +207,8 @@ routeToggle.addEventListener('click', function () {
 
 document.getElementById('route-use-location').addEventListener('click', function () {
   routeFrom.value = MY_LOCATION;
+  // Setting the value from code fires no input event, so send one to show (or hide) the × button
+  routeFrom.dispatchEvent(new Event('input'));
   routeResult.textContent = 'Finding your location…';
   locateMe()
     .then(function () {
@@ -198,6 +217,7 @@ document.getElementById('route-use-location').addEventListener('click', function
     })
     .catch(function (err) {
       routeFrom.value = '';
+      routeFrom.dispatchEvent(new Event('input'));
       routeResult.textContent = err.message;
     });
 });

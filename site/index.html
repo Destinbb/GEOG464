@@ -79,11 +79,17 @@
             <strong class="route-title">Plan a bike route:</strong>
             <label for="route-from">From</label>
             <div class="route-row">
-              <input id="route-from" type="text" placeholder="e.g. 4500 rue Saint-Denis" autocomplete="off" />
+              <span class="clear-wrap">
+                <input id="route-from" type="text" placeholder="e.g. 4500 rue Saint-Denis" autocomplete="off" />
+                <button class="clear-button" type="button" data-clears="route-from" aria-label="Clear From" hidden>×</button>
+              </span>
               <button id="route-use-location" type="button">My location</button>
             </div>
             <label for="route-to">To</label>
-            <input id="route-to" type="text" placeholder="e.g. Atwater Market" autocomplete="off" />
+            <span class="clear-wrap">
+              <input id="route-to" type="text" placeholder="e.g. Atwater Market" autocomplete="off" />
+              <button class="clear-button" type="button" data-clears="route-to" aria-label="Clear To" hidden>×</button>
+            </span>
             <button type="submit">Plan route</button>
             <p id="route-result" aria-live="polite"></p>
           </form>
@@ -106,5 +112,7 @@
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="app.js"></script>
+    <script src="memory.js"></script>
+    <script>addMemory(map);</script>
   </body>
 </html>

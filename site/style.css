@@ -239,6 +239,43 @@ a {
   background: #f1f5f9;
 }
 
+/* × clear buttons inside the From and To boxes */
+.clear-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.clear-wrap input {
+  padding-right: 26px; /* room for the × so typed text never runs under it */
+}
+
+.clear-button {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 18px;
+  cursor: pointer;
+}
+
+.clear-button[hidden] {
+  display: none;
+}
+
+.clear-button:hover,
+.clear-button:focus-visible {
+  background: #e5e7eb;
+  color: var(--text);
+}
+
 /* "Plan a route" button: hidden on a computer, shown on phones (see the phone rules below) */
 .route-toggle {
   display: none;
@@ -307,13 +344,19 @@ a {
   /* On a phone the route form stacks: each label on its own line, boxes full width */
   #route-form label,
   #route-form .route-row,
-  #route-form input,
+  #route-form > .clear-wrap,
   .route-title {
     flex-basis: 100%;
   }
 
   #route-form input {
     width: 100%;
+  }
+
+  /* The From box shares its row with "My location", so it takes the space left over */
+  .route-row .clear-wrap {
+    flex: 1;
+    min-width: 0;
   }
 
   /* "Plan a route" and "Locate me" share one row; the form opens below them */
