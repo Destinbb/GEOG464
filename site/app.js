@@ -98,6 +98,9 @@ locateButton.addEventListener('click', function () {
 // ---------- Plan a route from A to B ----------
 // Route line sits in its own pane, above the bike-lane layers, so toggling layers never hides it
 map.createPane('routePane').style.zIndex = 450;
+// The route is drawn on its own canvas that covers the whole map. Let clicks pass through it,
+// so the bike-lane and pavement popups underneath still open while a route is shown.
+map.getPane('routePane').style.pointerEvents = 'none';
 const routeLayer = L.layerGroup().addTo(map);
 
 // Nominatim reads French street words best, so expand common English forms: "Blvd W" -> "boulevard Ouest"
