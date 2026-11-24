@@ -32,10 +32,10 @@ const MEMORY = {
   collection: "points",              // shared route: the Firestore collection name
   // Shared route only: paste your Firebase web config here. Leave apiKey as PASTE for the personal route.
   firebaseConfig: {
-    apiKey: "PASTE",
-    authDomain: "PASTE.firebaseapp.com",
-    projectId: "PASTE",
-    appId: "PASTE"
+    apiKey: "AIzaSyA2O28kwhisqJvCBkCNa_Qq7wdFuYRz0mM",
+    authDomain: "montreal-bicycle-network.firebaseapp.com",
+    projectId: "montreal-bicycle-network",
+    appId: "1:783311647601:web:4ac2b88adbe762f0247cd0"
   }
 };
 // ===== END OF THE PART TO CHANGE =====
