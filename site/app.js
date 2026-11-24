@@ -415,6 +415,8 @@ Promise.all([
       return value === 'yes' ? 'Yes' : value === 'no' ? 'No' : 'not recorded';
     }
 
+    // Most stations have no name in OpenStreetMap, so number them for the popup and the saved list
+    let stationNumber = 0;
     const repairLayer = L.geoJSON(repairData, {
       pointToLayer: function (feature, latlng) {
         return L.circleMarker(latlng, {
@@ -427,8 +429,10 @@ Promise.all([
       },
       onEachFeature: function (feature, layer) {
         const p = feature.properties;
+        stationNumber += 1;
+        p.label = 'Repair station ' + stationNumber + (p.operator ? ' (' + p.operator + ')' : '');
         layer.bindPopup(
-          '<strong>Bike repair station</strong><br>' +
+          '<strong>' + p.label + '</strong><br>' +
           'Air pump: ' + yesNo(p['service:bicycle:pump']) + '<br>' +
           'Tools: ' + yesNo(p['service:bicycle:tools']) + '<br>' +
           'Hours: ' + (p.opening_hours || 'not recorded') + '<br>' +
@@ -436,6 +440,11 @@ Promise.all([
         );
       }
     });
+
+    // Readers can save repair stations; the list stays in their own browser (remember.js)
+    if (repairData) {
+      rememberMarks(map, repairLayer, { idField: '@id', nameField: 'label', title: 'My repair stations' });
+    }
 
     const overlays = {
       '<span class="layer-swatch protected"></span>Protected lanes': protectedLayer,
