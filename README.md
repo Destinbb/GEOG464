@@ -63,7 +63,7 @@ Changed McGill location to downtown, as prior searches brought you to the West I
 **What stayed mine:**
 I chose the pavement dataset and the ID_TRC join, the A3 card, the edge case and the decision that missing data is never shown as a score, test 3's example (Île-des-Sœurs), and checking each result on the map. I also decied to add a locate me feature and A to B route planning. I decided to restructure the page layout to show less information and put the locate me and A to B planning at the top of the site. 
 
-# B5:
+
 
 # A3 feature: Pavement Condition Index
 For A3 I added the Pavement Condition Index so my reader can see the road condition of each potential bike route. 
@@ -132,3 +132,37 @@ Line numbers are for `site/app.js` and the notebook as of November 13, 2026.
 **After:**
 
 ![After: a bike route planned from rue de Bellechasse to avenue Van Horne](images/after.png)
+
+
+## What my map remembers 
+The map remembers where the reader left place and zoom, the repair stations save to "My repair stations", and the points readers can add to report problems and ideas. 
+A cyclist planning routes over several visits can come back to the same routes, area and saved stations without searching again, and shared reports let cyclists warn
+each other about construction or problems on a route.
+
+***Where it is kept***
+- The map view and saved repair stations are personal: they are stored in the readers own brower(localstorage), in their respective device. Nobody else sees them. 
+-Added points are shared: they are stored in my Firebase database (northamerica-northeast1 (Montréal)) and every reader sees them. Each point keeps only its location, catergoty, note up to 80 characters an anonymous browser id and a time. No names. I will delete the database on 31 December 2026, after the course.
+
+**How to clear it**
+- Map view: press *Reset view* at the top left of the map.
+- A saved station: open its popup and press **Saved (remove)**.
+- A point they added: open it and press delete (readers can only delete their own points).
+- Everything personal at once: clear this site's data in their browser settings. 
+
+**Which file does the work:** `remember.js` saves the view and the saved stations; `memory.js`
+saves the shared points to Firebase. 
+
+**One thing I understand** localstorage is kept per website so destinbb.github.io and Live Server have a seperate saved list
+
+## A4 feature: routes scored with my data
+
+### Tests (written before the code)
+| # | What I do | Expected | Result |
+| --- | --- | --- | --- |
+| 1 | A longer trip: Oratoire Saint-Joseph → Marché Jean-Talon | Two routes drawn: one solid, one grey dashed. Two buttons with scores; labels "fastest" and "most protected" (one route can have both). The map starts on the most protected. Clicking the other button switches the solid line. | |
+| 2 | A short trip: Hall Building → Parc La Fontaine | One route with its scores, no labels, and "The router found only one route for this trip." | |
+| 3 | Edge: a trip on streets with no protected lanes | "0% on protected lanes", no error in the console. | |
+| 4 | Add a "Something is wrong" point right on route 1's line, note "test construction". Plan the trip again. | The warning lists "test construction". | |
+| 5 | Edge: add a point about 300 m from the route. Plan again. | Not listed. | |
+| 6 | Edge: a point with the note `<b>hi</b>` on the route | Shown as the plain text `<b>hi</b>`, not in bold, so readers' notes can't add HTML. | |
+| 7 | Edge: DevTools → Network → "Slow 3G", reload, and plan a route straight away | The route shows with "not scored yet", and no error. | |
