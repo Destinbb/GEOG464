@@ -3,8 +3,10 @@
   --page-background: #afbedc;
   --text: #1f2937;
   --muted: #4b5563;
-  --protected: #2166ac;
-  --other: #d01c8b;
+  /* Comfort levels (the same colours as COMFORT in app.js) */
+  --separated: #2166ac;
+  --painted: #6baed6;
+  --shared: #d01c8b;
 }
 
 * {
@@ -167,12 +169,36 @@ a {
   vertical-align: middle;
 }
 
-.layer-swatch.protected {
-  background: var(--protected);
+/* Swatches match the lines: thick solid, medium solid, thin dashed */
+.layer-swatch.separated {
+  height: 5px;
+  background: var(--separated);
 }
 
-.layer-swatch.other {
-  background: repeating-linear-gradient(90deg, var(--other) 0 6px, transparent 6px 10px);
+.layer-swatch.painted {
+  background: var(--painted);
+}
+
+.layer-swatch.shared {
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--shared) 0 6px, transparent 6px 10px);
+}
+
+/* Lane types key in the "How to use" tab (the legend on phones, where the layer box is folded) */
+.lane-key {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lane-key li {
+  margin-bottom: 4px;
+}
+
+/* "Year-round routes only", at the bottom of the layer box */
+.year-round-filter {
+  display: block;
+  cursor: pointer;
 }
 
 .layer-swatch.repair {

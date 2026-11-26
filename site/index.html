@@ -11,8 +11,9 @@
       --page-background: #afbedc;
       --text: #1f2937;
       --muted: #4b5563;
-      --protected: #2166ac;
-      --other: #d01c8b;
+      --separated: #2166ac;
+      --painted: #6baed6;
+      --shared: #d01c8b;
       --repair: #1b7837;
     }
     * { box-sizing: border-box; }
@@ -72,8 +73,9 @@
     .legend { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
     .legend li { display: flex; gap: 12px; align-items: center; }
     .swatch { flex: none; width: 38px; height: 0; border-top: 5px solid; }
-    .swatch.protected { border-color: var(--protected); }
-    .swatch.other { border-color: var(--other); border-top-style: dashed; }
+    .swatch.separated { border-color: var(--separated); border-top-width: 6px; }
+    .swatch.painted { border-color: var(--painted); border-top-width: 4px; }
+    .swatch.shared { border-color: var(--shared); border-top-width: 3px; border-top-style: dashed; }
     .swatch.pavement { border-image: linear-gradient(90deg, #fed98e, #fe9929, #d95f0e, #993404) 1; }
     .dot { flex: none; width: 14px; height: 14px; margin: 0 12px; border-radius: 50%; background: var(--repair); border: 2px solid white; box-shadow: 0 0 0 1px #9ca3af; }
 
@@ -103,7 +105,7 @@
         <a class="cta" href="map.html">Open the map →</a>
         <span class="cta-note">Free, no account needed. Works on your phone.</span>
       </div>
-      <img src="img/preview.png" alt="The map of Montreal with its protected bike lanes drawn in solid blue, the route planner above it and the map controls around it.">
+      <img src="img/preview.png" alt="The map of Montreal with its bike lanes drawn in blue, the route planner above it and the map controls around it.">
     </section>
 
     <h2>What you can do</h2>
@@ -111,13 +113,13 @@
       <li>
         <span class="icon" aria-hidden="true">🧭</span>
         <h3>Plan a route from A to B</h3>
-        <p>Compare up to two routes by time, share on protected lanes, and kilometres of rough pavement.</p>
+        <p>Compare up to two routes by time, share separated from cars, share open year-round, and kilometres of rough pavement.</p>
         <p class="how">Type a start and end address at the top, then press <strong>Plan route</strong>.</p>
       </li>
       <li>
         <span class="icon" aria-hidden="true">🛡️</span>
-        <h3>See where you're protected</h3>
-        <p>Blue lines have a physical barrier between you and cars. Search a neighbourhood to zoom to its protected routes.</p>
+        <h3>See where you're separated from cars</h3>
+        <p>Dark blue lines have a curb, barrier or separate path between you and cars. Search a neighbourhood to zoom to them.</p>
         <p class="how">Click any line for its type, borough and whether it's open year-round.</p>
       </li>
       <li>
@@ -137,8 +139,10 @@
     <h2>Reading the map</h2>
     <div class="panel">
       <ul class="legend">
-        <li><span class="swatch protected" aria-hidden="true"></span><span><strong>Solid blue</strong>: protected lane, separated from traffic year-round</span></li>
-        <li><span class="swatch other" aria-hidden="true"></span><span><strong>Dashed pink</strong>: not identified as protected (painted lane, shared street, or seasonal path)</span></li>
+        <li><span class="swatch separated" aria-hidden="true"></span><span><strong>Thick dark blue</strong>: separated from cars (a curb, barrier or separate path; multi-use trails are shared with people walking)</span></li>
+        <li><span class="swatch painted" aria-hidden="true"></span><span><strong>Light blue</strong>: painted lane, your own lane but only paint between you and cars</span></li>
+        <li><span class="swatch shared" aria-hidden="true"></span><span><strong>Dashed pink</strong>: shared with traffic, no lane of your own (off at the start)</span></li>
+        <li><span class="swatch" aria-hidden="true" style="border-color: transparent"></span><span><strong>Year-round routes only</strong> (checkbox in the layer menu): hides routes that close in winter</span></li>
         <li><span class="swatch pavement" aria-hidden="true"></span><span><strong>Yellow to brown</strong>: pavement condition, from good to very poor (2024 city survey)</span></li>
         <li><span class="dot" aria-hidden="true"></span><span><strong>Green dot</strong>: public bike repair station</span></li>
       </ul>
@@ -148,7 +152,7 @@
     <div class="panel">
       <ol class="steps">
         <li>Open the map and type <em>4500 rue Saint-Denis</em> in <strong>From</strong> and <em>Atwater Market</em> in <strong>To</strong>.</li>
-        <li>Press <strong>Plan route</strong>. The route with the most protected lanes is drawn first.</li>
+        <li>Press <strong>Plan route</strong>. The route most separated from cars is drawn first.</li>
         <li>Tap the other route buttons to compare. Is a few extra minutes worth more protection?</li>
       </ol>
       <p style="margin:16px 0 0"><a class="cta" href="map.html">Try it now →</a></p>

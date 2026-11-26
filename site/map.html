@@ -32,7 +32,13 @@
         </section>
 
         <section id="panel-how" class="tab-panel" hidden>
-          <p><strong>What you can do here:</strong> Press <strong>Locate me</strong> to see where you are on the map, or type a start and end address to plan a bike route from A to B. Click a road segment to see its details. Compare protected and unprotected bike routes by toggling the visibility of each layer. Popup information for each segment explains its type, area, protection status, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
+          <p><strong>What you can do here:</strong> Press <strong>Locate me</strong> to see where you are on the map, or type a start and end address to plan a bike route from A to B. Click a road segment to see its details. Compare how separated from cars each route is by turning the lane layers on and off, and tick <strong>Year-round routes only</strong> to see what you can ride in winter. Popup information for each segment explains its type, area, comfort level, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
+          <p><strong>Lane types:</strong></p>
+          <ul class="lane-key">
+            <li><span class="layer-swatch separated" aria-hidden="true"></span><strong>Separated from cars</strong> (thick solid dark blue): a curb, barrier or separate path between you and traffic. Multi-use trails are shared with people walking.</li>
+            <li><span class="layer-swatch painted" aria-hidden="true"></span><strong>Painted lane</strong> (medium solid light blue): your own lane, but only paint between you and cars.</li>
+            <li><span class="layer-swatch shared" aria-hidden="true"></span><strong>Shared with traffic</strong> (thin dashed pink): no lane of your own; you ride in the street with cars or buses. Off at the start.</li>
+          </ul>
         </section>
 
         <section id="panel-data" class="tab-panel" hidden>
@@ -104,7 +110,7 @@
 
       <form id="search-form">
         <p class="map-hint"><strong>Click any route</strong> for its details. Turn on <strong>Pavement condition</strong> (top right) to see road quality.</p>
-        <label for="search-input">Find protected routes in a neighbourhood:</label>
+        <label for="search-input">Find routes separated from cars in a neighbourhood:</label>
         <input id="search-input" type="search" placeholder="e.g. Verdun, Plateau" />
         <button type="submit">Search</button>
         <p id="search-result"></p>

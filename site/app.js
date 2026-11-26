@@ -34,6 +34,29 @@ tabs.forEach(function (tab) {
 // ---------- Locate me ----------
 // A rough box around the island of Montreal, used to keep address results on the island
 const ISLAND = { west: -73.98, south: 45.40, east: -73.47, north: 45.71 };
+
+// ---------- Comfort levels: how a lane is built, not the city's "protected" flag ----------
+// The city's PROTEGE_4S field really means "protected and kept open all winter", so lanes are grouped
+// by facility_type instead. Every part of the map (layers, search, route scores) asks comfortLevel().
+const COMFORT = {
+  separated: { label: 'Separated from cars', color: '#2166ac', weight: 5, dashArray: null },
+  painted: { label: 'Painted lane', color: '#6baed6', weight: 3, dashArray: null },
+  shared: { label: 'Shared with traffic', color: '#d01c8b', weight: 2.5, dashArray: '8, 6' }
+};
+const SEPARATED_TYPES = [
+  'Piste cyclable en site propre',          // dedicated bike path
+  'Piste cyclable sur rue',                 // on-street protected lane
+  'Piste cyclable au niveau du trottoir',   // sidewalk-level path
+  'Sentier polyvalent'                      // multi-use trail
+];
+const PAINTED_TYPES = ['Bande cyclable'];   // bike lane: paint only
+
+// 'separated', 'painted' or 'shared' (designated roadway, bicycle street, shared bus-bike lane, anything else)
+function comfortLevel(facilityType) {
+  if (SEPARATED_TYPES.includes(facilityType)) return 'separated';
+  if (PAINTED_TYPES.includes(facilityType)) return 'painted';
+  return 'shared';
+}
 const myLocationLayer = L.layerGroup().addTo(map);
 let myLocation = null;
 let myLocationMarker = null;
@@ -225,8 +248,8 @@ function distanceToLine(p, line) {
   return shortest;
 }
 
-// Prepare every bike lane once: its points in metres, a box around it, whether it is protected,
-// and its pavement condition (looked up by ID_TRC; null when the survey has no record)
+// Prepare every bike lane once: its points in metres, a box around it, its comfort level, whether it is
+// open year-round, and its pavement condition (looked up by ID_TRC; null when the survey has no record)
 function buildLaneIndex(laneFeatures, pavementFeatures) {
   const pavementById = {};
   pavementFeatures.forEach(function (feature) {
@@ -244,7 +267,8 @@ function buildLaneIndex(laneFeatures, pavementFeatures) {
         line: line,
         minX: Math.min(...xs), maxX: Math.max(...xs),
         minY: Math.min(...ys), maxY: Math.max(...ys),
-        protected: feature.properties.protected === 'Oui',
+        comfort: comfortLevel(feature.properties.facility_type),
+        yearRound: feature.properties.year_round === 'Oui',
         pavement: pavementById[feature.properties.ID_TRC] || null
       });
     });
@@ -278,7 +302,9 @@ function checkPoints(line) {
 function scoreRoute(route) {
   const line = route.geometry.coordinates.map(function (c) { return toMetres(c[0], c[1]); });
   const points = checkPoints(line);
-  let onProtected = 0;
+  let onSeparated = 0;
+  let onPainted = 0;
+  let onYearRound = 0;
   let onPoorPavement = 0;
   points.forEach(function (p) {
     let nearest = null;
@@ -295,7 +321,9 @@ function scoreRoute(route) {
         nearestDistance = distance;
       }
     });
-    if (nearest && nearest.protected) onProtected += 1;
+    if (nearest && nearest.comfort === 'separated') onSeparated += 1;
+    if (nearest && nearest.comfort === 'painted') onPainted += 1;
+    if (nearest && nearest.yearRound) onYearRound += 1;
     if (nearest && (nearest.pavement === 'Mauvais' || nearest.pavement === 'Très mauvais')) onPoorPavement += 1;
   });
 
@@ -312,7 +340,9 @@ function scoreRoute(route) {
   });
 
   return {
-    protectedShare: points.length ? onProtected / points.length : 0,
+    separatedShare: points.length ? onSeparated / points.length : 0,
+    paintedShare: points.length ? onPainted / points.length : 0,
+    yearRoundShare: points.length ? onYearRound / points.length : 0,
     poorPavementKm: onPoorPavement * CHECK_EVERY / 1000,
     repairStations: repairStations,
     problems: problems
@@ -324,10 +354,10 @@ function showRoutes(start, end, routes) {
   const scored = routeData.lanes.length > 0;   // false if the bike lanes have not loaded yet
   const scores = routes.map(function (route) { return scored ? scoreRoute(route) : null; });
   let fastest = 0;
-  let mostProtected = 0;
+  let mostSeparated = 0;
   routes.forEach(function (route, i) {
     if (route.duration < routes[fastest].duration) fastest = i;
-    if (scored && scores[i].protectedShare > scores[mostProtected].protectedShare) mostProtected = i;
+    if (scored && scores[i].separatedShare > scores[mostSeparated].separatedShare) mostSeparated = i;
   });
 
   function draw(selected) {
@@ -360,12 +390,14 @@ function showRoutes(start, end, routes) {
     routes.forEach(function (route, i) {
       const labels = [];
       if (routes.length > 1 && i === fastest) labels.push('fastest');
-      if (routes.length > 1 && scored && i === mostProtected) labels.push('most protected');
+      if (routes.length > 1 && scored && i === mostSeparated) labels.push('most separated');
       let text = 'Route ' + (i + 1) + (labels.length ? ' (' + labels.join(', ') + ')' : '') + ': ' +
         (route.distance / 1000).toFixed(1) + ' km, about ' + Math.max(1, Math.round(route.duration / 60)) + ' min';
       if (scored) {
         const s = scores[i];
-        text += ', ' + Math.round(100 * s.protectedShare) + '% on protected lanes, ' +
+        text += ', ' + Math.round(100 * s.separatedShare) + '% separated from cars, ' +
+          Math.round(100 * s.paintedShare) + '% on painted lanes, ' +
+          Math.round(100 * s.yearRoundShare) + '% on lanes open year-round, ' +
           s.poorPavementKm.toFixed(1) + ' km on poor pavement, ' +
           s.repairStations + ' repair station' + (s.repairStations === 1 ? '' : 's') + ' within 200 m';
       }
@@ -397,7 +429,7 @@ function showRoutes(start, end, routes) {
     routeResult.append(caveat);
   }
 
-  draw(scored ? mostProtected : fastest);
+  draw(scored ? mostSeparated : fastest);
   map.fitBounds(L.geoJSON(routes.map(function (r) { return r.geometry; })).getBounds().pad(0.1));
 }
 
@@ -679,8 +711,6 @@ routeForm.addEventListener('submit', function (event) {
 });
 
 const colours = {
-  Yes: '#2166ac',
-  No: '#d01c8b',
   Repair: '#1b7837'
 };
 const pavementColours = {
@@ -724,11 +754,6 @@ Promise.all([
     routeData.lanes = buildLaneIndex(data.features, pavementData.features);
     routeData.repairStations = repairData ? repairData.features : [];
 
-    const protectedCount = data.features.filter(function (feature) {
-      return feature.properties.protected === 'Oui';
-    }).length;
-
-    const otherCount = data.features.length - protectedCount;
     const facilityTypeNames = {
       'Bande cyclable': 'Bike lane',
       'Chaussée désignée': 'Designated roadway',
@@ -749,7 +774,8 @@ Promise.all([
       layer.bindPopup(
         '<strong>' + (facilityTypeNames[p.facility_type] || p.facility_type || 'Bike lane') + '</strong><br>' +
         'Area: ' + (p.area || 'not recorded') + '<br>' +
-        'Protected: ' + (yesNoNames[p.protected] || p.protected || 'unknown') + '<br>' +
+        'Comfort: ' + COMFORT[comfortLevel(p.facility_type)].label +
+        (p.facility_type === 'Sentier polyvalent' ? ' (shared with people walking)' : '') + '<br>' +
         'Year-round: ' + (yesNoNames[p.year_round] || p.year_round || 'unknown') + '<br>' +
         'Length: ' + (p.length_m || 0) + ' m'
       );
@@ -764,32 +790,26 @@ Promise.all([
       });
     }
 
-    const protectedLayer = L.geoJSON(data, {
-      filter: function (feature) {
-        return feature.properties.protected === 'Oui';
-      },
-      style: {
-        color: colours.Yes,
-        weight: 4,
-        opacity: 0.9
-        
-
-      },
-      onEachFeature: addLanePopup
-    }).addTo(map);
-
-    const otherLayer = L.geoJSON(data, {
-      filter: function (feature) {
-        return feature.properties.protected !== 'Oui';
-      },
-      style: {
-        color: colours.No,
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '8, 6'
-      },
-      onEachFeature: addLanePopup
-    });
+    // One layer per comfort level. Its filter also hides seasonal lanes while "Year-round routes only" is ticked.
+    let yearRoundOnly = false;
+    function showsLane(feature, level) {
+      return comfortLevel(feature.properties.facility_type) === level &&
+        (!yearRoundOnly || feature.properties.year_round === 'Oui');
+    }
+    function makeLaneLayer(level) {
+      const c = COMFORT[level];
+      return L.geoJSON(data, {
+        filter: function (feature) { return showsLane(feature, level); },
+        style: { color: c.color, weight: c.weight, opacity: 0.9, dashArray: c.dashArray },
+        onEachFeature: addLanePopup
+      });
+    }
+    // Separated and painted lanes show at the start; shared streets are off to keep the map calm
+    const laneLayers = {
+      separated: makeLaneLayer('separated').addTo(map),
+      painted: makeLaneLayer('painted').addTo(map),
+      shared: makeLaneLayer('shared')
+    };
     const pavementLayer = L.geoJSON(pavementData, {
       style: function (feature) {
         return {
@@ -845,15 +865,38 @@ Promise.all([
     }
 
     const overlays = {
-      '<span class="layer-swatch protected"></span>Protected lanes': protectedLayer,
-      '<span class="layer-swatch other"></span>Not identified as protected': otherLayer,
+      '<span class="layer-swatch separated"></span>Separated from cars': laneLayers.separated,
+      '<span class="layer-swatch painted"></span>Painted lanes': laneLayers.painted,
+      '<span class="layer-swatch shared"></span>Shared with traffic': laneLayers.shared,
       '<span class="layer-swatch pavement"></span>Pavement condition (matched streets)': pavementLayer
     };
     if (repairData) {
       overlays['<span class="layer-swatch repair"></span>Bike repair stations'] = repairLayer;
     }
     // Collapse the layer list into an icon on phones so it doesn't cover the map
-    L.control.layers(null, overlays, { collapsed: isPhone }).addTo(map);
+    const layerControl = L.control.layers(null, overlays, { collapsed: isPhone }).addTo(map);
+
+    // "Year-round routes only" sits at the bottom of the layer box, so it adds no new box to the map
+    const layerList = layerControl.getContainer().querySelector('.leaflet-control-layers-list');
+    L.DomUtil.create('div', 'leaflet-control-layers-separator', layerList);
+    const yearRoundLabel = L.DomUtil.create('label', 'year-round-filter', layerList);
+    const yearRoundInput = L.DomUtil.create('input', '', yearRoundLabel);
+    yearRoundInput.type = 'checkbox';
+    yearRoundLabel.append(' Year-round routes only');
+
+    yearRoundInput.addEventListener('change', function () {
+      yearRoundOnly = yearRoundInput.checked;
+      // Empty each layer and fill it again: addData runs the filter, which now reads yearRoundOnly
+      Object.values(laneLayers).forEach(function (layer) {
+        layer.clearLayers();
+        layer.addData(data);
+      });
+      showStatus();
+      // An open neighbourhood search follows the checkbox too
+      if (document.getElementById('search-input').value.trim() !== '') {
+        document.getElementById('search-form').requestSubmit();
+      }
+    });
 
     // On phones the legend goes bottom-left so it doesn't stack on top of the zoom buttons
     const legend = L.control({ position: isPhone ? 'bottomleft' : 'bottomright' });
@@ -889,19 +932,26 @@ Promise.all([
     });
 
     // If you want to fit the map to the bounds of all bike lanes!!!:
-    //const allBikeLanes = L.featureGroup([protectedLayer, otherLayer]);
+    //const allBikeLanes = L.featureGroup(Object.values(laneLayers));
     //const bounds = allBikeLanes.getBounds();
     //if (bounds.isValid()) {
       //#map.fitBounds(bounds.pad(0.05)); 
    // }
 
-    const status = document.getElementById('status');
-    if (status) {
+    // Status line (Data sources tab): how many segments each comfort layer holds right now
+    function showStatus() {
+      const status = document.getElementById('status');
+      if (!status) return;
+      function count(level) { return laneLayers[level].getLayers().length; }
+      const total = count('separated') + count('painted') + count('shared');
       status.textContent =
-        data.features.length + ' bike-lane segments shown: ' +
-        protectedCount + ' protected, ' + otherCount + ' other.' +
+        total.toLocaleString('en-CA') + ' bike-lane segments' + (yearRoundOnly ? ' open year-round' : '') + ': ' +
+        count('separated').toLocaleString('en-CA') + ' separated from cars, ' +
+        count('painted').toLocaleString('en-CA') + ' painted lanes, ' +
+        count('shared').toLocaleString('en-CA') + ' shared with traffic.' +
         (repairData ? '' : ' Bike repair stations could not be loaded.');
     }
+    showStatus();
 
     // Search: lower-case, drop accents and apostrophes, and treat hyphens, dashes and spaces the same,
     // so "montreal nord", "montreal-nord" and "Montréal–Nord" all match
@@ -932,7 +982,7 @@ Promise.all([
       event.preventDefault();
       const typed = document.getElementById('search-input').value;
       const query = normalise(typed);
-      const matches = protectedLayer.getLayers().filter(function (layer) {
+      const matches = laneLayers.separated.getLayers().filter(function (layer) {
         return query && normalise(layer.feature.properties.area).includes(query);
       });
 
@@ -952,26 +1002,28 @@ Promise.all([
       }
 
       if (matches.length === 0) {
-        searchResult.textContent = 'No protected routes found for "' + typed + '".';
+        searchResult.textContent = 'No routes separated from cars' + (yearRoundOnly ? ' and open year-round' : '') +
+          ' found for "' + typed + '".';
         return;
       }
-      if (!map.hasLayer(protectedLayer)) {
-        protectedLayer.addTo(map);
+      if (!map.hasLayer(laneLayers.separated)) {
+        laneLayers.separated.addTo(map);
       }
       map.fitBounds(L.featureGroup(matches).getBounds().pad(0.05));
 
-      // Pavement summary: of this neighbourhood's protected segments that have a survey record,
+      // Pavement summary: of this neighbourhood's separated segments that have a survey record,
       // how many are in good or excellent condition. Segments with no record are left out, not counted as bad.
       const area = matches[0].feature.properties.area;
       const surveyed = pavementData.features.filter(function (feature) {
-        return feature.properties.protected === 'Oui' && feature.properties.area === area;
+        return showsLane(feature, 'separated') && feature.properties.area === area;
       });
       const good = surveyed.filter(function (feature) {
         const condition = feature.properties.pavement_condition;
         return condition === 'Excellent' || condition === 'Bon';
       }).length;
 
-      let summary = matches.length + ' protected segments in ' + area + '. ';
+      let summary = matches.length + ' segments separated from cars' + (yearRoundOnly ? ' and open year-round' : '') +
+        ' in ' + area + '. ';
       if (surveyed.length === 0) {
         summary += 'None have a pavement survey record.';
       } else {
