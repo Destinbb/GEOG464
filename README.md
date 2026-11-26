@@ -215,6 +215,7 @@ A review of my map against Nielsen's 10 usability heuristics found that my map's
 | 12 | Enter in the To box plans the route | Flexibility and efficiency | Done already (the route boxes are a form) | – |
 | 13 | Collision data: how many collisions lie along each route | New data | Planned | 4 |
 | 14 | Slope: how steep each street or route is (%), e.g. near Mont-Royal | New data | Planned | 5 |
+| 15 | Phone layout needs serious work: the controls crowd the map on a small screen | Aesthetic and minimalist design | Planned | later |
 
 ## Phase 0: landing page
 The site now opens on a landing page (`site/index.html`) that says who the map is for, what it can do and how to read it, with buttons to the map. The map itself moved to `site/map.html`.
@@ -229,3 +230,31 @@ The site now opens on a landing page (`site/index.html`) that says who the map i
 | 0.5 | Open the landing page on a phone | One column, readable, no sideways scrolling. | |
 | 0.6 | Lighthouse Accessibility on the landing page | 100, or a list of what to fix. | |
 | 0.7 | On the map, press "← Back to home" (also with Tab and Enter) | The landing page opens; the browser's back button returns to the map. | |
+
+## Phase 1: comfort levels and a year-round filter
+**The finding:** my map split the lanes by the city's `protected` field (`PROTEGE_4S`). 2,561 of the 2,565 "protected" segments are also year-round, so the field behaves like "protected **and** kept open all winter". As a result, 1,027 dedicated bike paths and 521 multi-use trails with no cars at all (including 147 dedicated paths in Le Sud-Ouest and Lachine, along the Lachine Canal) showed as dashed pink "not identified as protected", while 58 painted lanes and 16 shared roadways showed as protected.
+
+**The change:** lanes are now coloured by **how they are built** (`facility_type`), in three comfort levels, and winter is a separate question with its own checkbox.
+
+| Comfort level | Facility types | Segments | Year-round | Style |
+| --- | --- | --- | --- | --- |
+| Separated from cars | dedicated bike path, on-street protected lane, sidewalk-level path, multi-use trail | 4,549 | 2,653 | thick solid dark blue |
+| Painted lane | bike lane (*bande cyclable*) | 2,413 | 2,058 | medium solid light blue |
+| Shared with traffic | designated roadway, bicycle street, shared bus-bike lane | 2,521 | 2,089 | thin dashed pink (off at the start) |
+
+**Limits:** some "separated" lanes are only separated in summer (450 on-street protected lanes are not protected all year, probably because their bollards come out in winter), which is what the year-round checkbox is for. Multi-use trails are separated from cars but shared with people walking.
+
+**What changed with it:** the neighbourhood search, its pavement summary and the route scores now use "separated from cars" instead of the city's `protected` field, so my A3 test numbers changed. The A3 results above are kept as a record of what the map did then (Verdun: 277 protected segments; now 323 separated from cars).
+
+### Tests (written before the code)
+| # | What I do | Expected | Result |
+| --- | --- | --- | --- |
+| 1.1 | Find the Lachine Canal path in Le Sud-Ouest and click it | Thick dark blue; popup says "Comfort: Separated from cars". | |
+| 1.2 | Turn on all three lane layers and click a *bande cyclable* (bike lane) | Light blue; popup says "Comfort: Painted lane". | |
+| 1.3 | Load the map and open the Data sources tab | Status: 9,483 segments: 4,549 separated from cars, 2,413 painted lanes, 2,521 shared with traffic. | |
+| 1.4 | Tick "Year-round routes only" | Status: 2,653 / 2,058 / 2,089; seasonal lines disappear. Untick: back to the numbers in 1.3. | |
+| 1.5 | Search "Verdun" | "323 segments separated from cars in Verdun. 188 have a pavement survey record; 77 of those (41%) are in good or excellent condition." | |
+| 1.6 | Search "Ville-Marie", then "Pierrefonds" | 411 / 255 / 71 (28%), then 236 / 91 / 27 (30%). | |
+| 1.7 | Plan Oratoire Saint-Joseph → Marché Jean-Talon | Route buttons show "% separated from cars", "% on painted lanes" and "% open year-round", and the label "most separated". | |
+| 1.8 | Press Tab through the layer box | The "Year-round routes only" checkbox can be reached and ticked with the keyboard. | |
+| 1.9 | Compare the landing page legend and the "How to use" tab with the map | Same three levels, colours and words. | |
