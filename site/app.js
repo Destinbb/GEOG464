@@ -72,13 +72,35 @@ function locateMe() {
   });
 }
 
-// The Locate me button sits in the tools row at the top of the page
+// Locate me: a small crosshair button just above the + and − zoom buttons.
+// A message (e.g. "Location is blocked") appears above the button when needed.
+const LocateControl = L.Control.extend({
+  onAdd: function () {
+    const box = L.DomUtil.create('div', 'locate-map-control');
+    box.innerHTML =
+      '<p class="locate-message" role="status" hidden></p>' +
+      '<div class="leaflet-bar">' +
+        '<button id="locate-button" class="locate-icon" type="button" aria-label="Locate me" title="Locate me">' +
+          '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false">' +
+            '<circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" stroke-width="2"/>' +
+            '<circle cx="12" cy="12" r="2.5" fill="currentColor"/>' +
+            '<path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2"/>' +
+          '</svg>' +
+        '</button>' +
+      '</div>';
+    L.DomEvent.disableClickPropagation(box);
+    return box;
+  }
+});
+new LocateControl({ position: 'bottomright' }).addTo(map);
+
 const locateButton = document.getElementById('locate-button');
 const locateMessage = document.querySelector('.locate-message');
 
 locateButton.addEventListener('click', function () {
   locateButton.disabled = true;
-  locateButton.textContent = 'Locating…';
+  locateButton.setAttribute('aria-label', 'Locating…');
+  locateButton.title = 'Locating…';
   locateMessage.hidden = true;
   locateMe()
     .then(function (latlng) {
@@ -91,7 +113,8 @@ locateButton.addEventListener('click', function () {
     })
     .finally(function () {
       locateButton.disabled = false;
-      locateButton.textContent = 'Locate me';
+      locateButton.setAttribute('aria-label', 'Locate me');
+      locateButton.title = 'Locate me';
     });
 });
 
@@ -414,7 +437,8 @@ routeToggle.addEventListener('click', function () {
   map.invalidateSize();
 });
 
-document.getElementById('route-use-location').addEventListener('click', function () {
+// Use the reader's location as the start (chosen from the From suggestions)
+function useMyLocation() {
   routeFrom.value = MY_LOCATION;
   // Setting the value from code fires no input event, so send one to show (or hide) the × button
   routeFrom.dispatchEvent(new Event('input'));
@@ -429,14 +453,190 @@ document.getElementById('route-use-location').addEventListener('click', function
       routeFrom.dispatchEvent(new Event('input'));
       routeResult.textContent = err.message;
     });
-});
+}
+
+// ---------- Address suggestions under the From and To boxes ----------
+// Suggestions come from Photon, an OpenStreetMap search made for search-as-you-type
+// (Nominatim's rules do not allow it). Each suggestion already has its point, so a chosen
+// suggestion does not need to be looked up again when the reader presses Plan route.
+const chosenPlaces = {};   // the suggestion picked in each box: { text, place }
+
+// The place picked for a box, but only if the box still shows exactly that text
+function chosenPlace(input) {
+  const chosen = chosenPlaces[input.id];
+  return chosen && chosen.text === input.value.trim() ? chosen.place : null;
+}
+
+// A readable line from Photon's fields, e.g. "Marché Atwater, Avenue Atwater, Le Sud-Ouest, Montréal"
+function photonLabel(p) {
+  const street = p.street ? (p.housenumber ? p.housenumber + ' ' + p.street : p.street) : null;
+  const parts = [p.name, street, p.district || p.locality, p.city];
+  return parts.filter(function (part, i) { return part && parts.indexOf(part) === i; }).join(', ');
+}
+
+function searchPhoton(text) {
+  // lang=fr: Photon otherwise answers in the browser's language, and the island check below needs the French name
+  const url = 'https://photon.komoot.io/api/?limit=5&lang=fr' +
+    '&bbox=' + [ISLAND.west, ISLAND.south, ISLAND.east, ISLAND.north].join(',') +
+    '&q=' + encodeURIComponent(text);
+  return fetch(url)
+    .then(function (response) {
+      if (!response.ok) {
+        throw new Error('Photon answered ' + response.status);
+      }
+      return response.json();
+    })
+    .then(function (data) {
+      const seen = {};
+      return data.features.filter(function (feature) {
+        // The search box also reaches Laval and Longueuil: keep places on the island, like the bike network
+        return feature.properties.county === 'Agglomération de Montréal';
+      }).map(function (feature) {
+        const c = feature.geometry.coordinates;
+        return { label: photonLabel(feature.properties), latlng: L.latLng(c[1], c[0]) };
+      }).filter(function (item) {
+        if (!item.label || seen[item.label]) return false;   // skip blank and repeated lines
+        seen[item.label] = true;
+        return true;
+      });
+    });
+}
+
+// Turn a box into a combobox: a list of suggestions that works with the mouse, touch and keyboard
+function addSuggestions(input, offerMyLocation) {
+  const list = document.getElementById(input.getAttribute('aria-controls'));
+  const extras = offerMyLocation ? [{ label: MY_LOCATION, myLocation: true }] : [];
+  let items = [];
+  let active = -1;        // which suggestion the arrow keys are on; -1 means none
+  let timer = null;
+  let requestNumber = 0;  // so a slow, older answer never replaces a newer one
+
+  function close() {
+    list.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+    active = -1;
+  }
+
+  function show(newItems) {
+    items = newItems;
+    list.textContent = '';
+    items.forEach(function (item, i) {
+      const li = document.createElement('li');
+      li.id = list.id + '-' + i;
+      li.className = 'suggestion' + (item.myLocation ? ' suggestion-location' : '') + (item.note ? ' suggestion-note' : '');
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', 'false');
+      if (item.note) li.setAttribute('aria-disabled', 'true');
+      li.textContent = item.label;   // shown as text, never as HTML
+      // mousedown, not click: it runs before the box loses focus, so the list is still there
+      li.addEventListener('mousedown', function (event) {
+        event.preventDefault();
+        if (!item.note) choose(item);
+      });
+      list.append(li);
+    });
+    active = -1;
+    input.removeAttribute('aria-activedescendant');
+    list.hidden = items.length === 0;
+    input.setAttribute('aria-expanded', String(items.length > 0));
+  }
+
+  function highlight(index) {
+    list.querySelectorAll('.suggestion').forEach(function (li, i) {
+      li.classList.toggle('active', i === index);
+      li.setAttribute('aria-selected', String(i === index));
+    });
+    active = index;
+    if (index >= 0) {
+      input.setAttribute('aria-activedescendant', list.id + '-' + index);
+      document.getElementById(list.id + '-' + index).scrollIntoView({ block: 'nearest' });
+    }
+  }
+
+  // Move the highlight up or down, skipping notes that cannot be chosen
+  function move(step) {
+    let next = active;
+    for (let tries = 0; tries < items.length; tries++) {
+      next = (next + step + items.length) % items.length;
+      if (!items[next].note) {
+        highlight(next);
+        return;
+      }
+    }
+  }
+
+  function choose(item) {
+    close();
+    if (item.myLocation) {
+      useMyLocation();
+      return;
+    }
+    input.value = item.label;
+    chosenPlaces[input.id] = { text: item.label, place: { latlng: item.latlng, name: item.label } };
+    input.dispatchEvent(new Event('input'));   // shows the × button (this event is ignored below)
+    if (input === routeFrom) routeTo.focus();
+  }
+
+  function update() {
+    const text = input.value.trim();
+    clearTimeout(timer);
+    if (text.length < 3) {
+      show(extras);   // too short to search: only "My location" (From box), or nothing
+      return;
+    }
+    // Wait until the reader pauses typing for 0.3 s, so Photon gets one request per pause
+    timer = setTimeout(function () {
+      const mine = ++requestNumber;
+      searchPhoton(text)
+        .then(function (results) {
+          if (mine !== requestNumber || document.activeElement !== input) return;
+          show(extras.concat(results));
+        })
+        .catch(function () {
+          if (mine !== requestNumber || document.activeElement !== input) return;
+          show(extras.concat([{
+            label: 'Suggestions are not available right now. You can still type the full address and press Plan route.',
+            note: true
+          }]));
+        });
+    }, 300);
+  }
+
+  input.addEventListener('input', function (event) {
+    if (!event.isTrusted) return;   // the page changed the text itself (e.g. after a choice): do not search again
+    update();
+  });
+  input.addEventListener('focus', update);
+  input.addEventListener('blur', close);
+
+  input.addEventListener('keydown', function (event) {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (list.hidden) {
+        update();
+      } else {
+        move(event.key === 'ArrowDown' ? 1 : -1);
+      }
+    } else if (event.key === 'Enter' && !list.hidden && active >= 0) {
+      event.preventDefault();   // choose the suggestion instead of planning the route
+      choose(items[active]);
+    } else if (event.key === 'Escape' && !list.hidden) {
+      event.preventDefault();
+      close();
+    }
+  });
+}
+
+addSuggestions(routeFrom, true);
+addSuggestions(routeTo, false);
 
 routeForm.addEventListener('submit', function (event) {
   event.preventDefault();
   const fromText = routeFrom.value.trim();
   const toText = routeTo.value.trim();
   if (fromText === '' || toText === '') {
-    routeResult.textContent = 'Type a start and an end address, or press "My location" for the start.';
+    routeResult.textContent = 'Type a start and an end address, or choose "My location" in the From box for the start.';
     return;
   }
 
@@ -444,17 +644,22 @@ routeForm.addEventListener('submit', function (event) {
   submitButton.disabled = true;
   routeResult.textContent = 'Planning your route…';
 
-  const startPlace = fromText.toLowerCase() === MY_LOCATION.toLowerCase()
+  // A place picked from the suggestions already has its point; otherwise look the text up
+  const usingMyLocation = fromText.toLowerCase() === MY_LOCATION.toLowerCase();
+  const startChosen = chosenPlace(routeFrom);
+  const endChosen = chosenPlace(routeTo);
+  const startPlace = usingMyLocation
     ? (myLocation ? Promise.resolve(myLocation) : locateMe()).then(function (latlng) {
       return { latlng: latlng, name: 'your location' };
     })
-    : findPlace(fromText);
+    : startChosen ? Promise.resolve(startChosen) : findPlace(fromText);
 
-  // Nominatim asks for no more than one request per second, so look up the end after the start
+  // Nominatim asks for no more than one request per second: wait only if both ends are looked up there
+  const wait = !usingMyLocation && !startChosen && !endChosen ? 1000 : 0;
   startPlace
     .then(function (start) {
-      return new Promise(function (resolve) { setTimeout(resolve, 1000); })
-        .then(function () { return findPlace(toText); })
+      return new Promise(function (resolve) { setTimeout(resolve, wait); })
+        .then(function () { return endChosen || findPlace(toText); })
         .then(function (end) { return [start, end]; });
     })
     .then(function ([start, end]) {

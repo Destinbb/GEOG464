@@ -159,28 +159,38 @@ saves the shared points to Firebase.
 ### Tests (written before the code)
 | # | What I do | Expected | Result |
 | --- | --- | --- | --- |
-| 1 | A longer trip: Oratoire Saint-Joseph → Marché Jean-Talon | Two routes drawn: one solid, one grey dashed. Two buttons with scores; labels "fastest" and "most protected" (one route can have both). The map starts on the most protected. Clicking the other button switches the solid line. | Passed: Nov 25. Route 1 (fastest, most protected): 6.4 km, about 35min, 15% on protected lanes, 0.1 kms on proor pavement, 6 repair stations within 200m. Route 2: 6.8 kms, about 36 min, *% on protected lanes, 0.5km on poor pavment, 2 repair stations within 200m |
-| 2 | A short trip: Hall Building → Parc La Fontaine | One route with its scores, no labels, and "The router found only one route for this trip." |Passed but router returned 2 routes: Route 1 (fastest, most protected): 4.5 km, about 25min, 32% on protected lanes, 0.2 on poor pavement, 3 repair stations within 200m. Route 2: 4.3km, about 27 min, 12% on protected lanes, 0.4 km on poor pavement, 2 repair stations within 200m  |
-|2.5| Even shorter route: | one route with score.... | still finds 2 routes
-| 3 | Edge: a trip on streets with no protected lanes | "0% on protected lanes", no error in the console. |Passed: A: 138, Avenue Beverley, Mount Royal. B: 66, Avenue Vivian, Mount Royal. Route 1: 0.4 km, about 2 min, 0 % on protected lanes, 0% on poor pavement, 0 repair stations within 200m.|
-| 4 | Add a "Something is wrong" point right on route 1's line, note "Test". Plan the trip again. | The warning lists "test construction". |Passed: Reported by readers within 50 m of this route: Test displayed under route.  |
+| 1 | A longer trip: Oratoire Saint-Joseph → Marché Jean-Talon | Two routes drawn: one solid, one grey dashed. Two buttons with scores; labels "fastest" and "most protected" (one route can have both). The map starts on the most protected. Clicking the other button switches the solid line. | Passed: Nov 25. Route 1 (fastest, most protected): 6.4 km, about 35min, 15% on protected lanes, 0.1 kms on poor pavement, 6 repair stations within 200m. Route 2: 6.8 kms, about 36 min, 8% on protected lanes, 0.5km on poor pavment, 2 repair stations within 200m |
+| 2 | A short trip: Hall Building → Parc La Fontaine | One route with its scores, no labels, and "The router found only one route for this trip." |Failed as written: the router returned 2 routes (see "How the router works"), because almost every trip gets an alternative. Route 1 (fastest, most protected): 4.5 km, about 25min, 32% on protected lanes, 0.2 on poor pavement, 3 repair stations within 200m. Route 2: 4.3km, about 27 min, 12% on protected lanes, 0.4 km on poor pavement, 2 repair stations within 200m. Fastest means shorest time not distance |
+|2.5| Even shorter route: 8536 av de Gaspé -> Parc Jarry | one route with score.... | Failed as written: Route 1 (fastest, most protected): 1.6 km, about 11 min, 0% on protected lanes, 0.0 km on poor pavement, 0 repair stations within 200 m.  Route 2: 1.6 km, about 11 min, 0% on protected lanes, 0.0 km on poor pavement, 0 repair stations within 200 m. See how the router works |
+| 3 | Edge: a trip on streets with no protected lanes | "0% on protected lanes", no error in the console. |Passed: A: 138, Avenue Beverley, Mount Royal. B: 66, Avenue Vivian, Mount Royal. Route 1: 0.4 km, about 2 min, 0 % on protected lanes, 0 km on poor pavement, 0 repair stations within 200m. The router found only one route for this trip.|
+| 4 | Add a "Something is wrong" point right on route 1's line, note "Test". Plan the trip again. | The warning lists "Test". |Passed: Reported by readers within 50 m of this route: "Test" displayed under route.  |
 | 5 | Edge: add a point about 300 m from the route from 4. Plan again. | Not listed. | Only Test is listed|
-| 6 | Edge: a point with the note `<b>hi</b>` on the route | Shown as the plain text `<b>hi</b>`, not in bold, so readers' notes can't add HTML. |The warning shows  <b>hi</b> as plain text, not in bold.|
-| 7 | Edge: DevTools → Network → "Slow 3G", reload, and plan a route straight away | The route shows with "not scored yet", and no error. |Passed:A: 8536, Avenue De Gaspé, Villeray. B: Parc Jarry, 205, Villeray–Saint-Michel–Parc-Extension. the page still loads right away |
+| 6 | Edge: a point with the note (`<b>hi</b>`) on the route | Shown as the plain text (`<b>hi</b>`), not in bold, so readers' notes can't add HTML. |The warning shows  <b>hi</b> as plain text, not in bold.|
+| 7 | Edge: DevTools → Network → "Slow 3G", reload, and plan a route straight away | The route shows with "not scored yet", and no error. |Passed:A: 8536, Avenue De Gaspé, Villeray. B: Parc Jarry, 205, Villeray–Saint-Michel–Parc-Extension. Finish |
 
 ### How the router works (roughly)
-Planning a route uses two outside services and then my own data:
+Planning a route uses two outside services and then the maps data:
 
 1. **Finding the addresses (Nominatim).** The From and To text is sent to Nominatim, OpenStreetMap's address search, limited to the island of Montreal. It returns a point (latitude and longitude) for each address.
-2. **Finding the routes (OSRM, bike profile).** The two points are sent to routing.openstreetmap.de, which runs OSRM on OpenStreetMap's street network. OSRM treats the streets as a network of connected pieces. Its bike profile gives each piece a riding speed depending on what kind of street it is (bike paths and quiet streets are preferred, busy roads are slower, motorways are not allowed, one-way rules apply), and it searches for the path with the shortest riding time. To answer quickly, it uses shortcuts it worked out in advance, so it does not have to check every street on every request.
-3. **Alternatives.** My map asks for alternatives (`alternatives=true`), which allows at most one extra route. OSRM does not just return the second-shortest path, which would usually be the best route with a small detour around one block. Roughly, an alternative has to pass three tests:
+
+2. **Finding the routes (OSRM, bike profile).** The two points are sent to routing.openstreetmap.de, which runs OSRM on OpenStreetMap's street network. OSRM treats the streets as a network of connected pieces. Its bike profile gives each piece a riding speed depending on what kind of street it is (bike paths and quiet streets are preferred, busy roads are slower, motorways are not allowed, one-way rules apply), and it searches for the path with the shortest riding time. It uses shortcuts it worked out in advance, so it does not have to check every street on every request.
+
+3. **Alternatives.** The map asks for alternatives (`alternatives=true`), which allows at most one extra route. OSRM does not just return the second-shortest path, which would usually be the best route with a small detour around one block. Roughly, an alternative has to pass three tests:
    - it is not much longer than the best route (about 25% at most);
    - it does not share most of its streets with the best route;
    - it has no pointless detours: every part of it is itself a sensible way to ride.
 
    If a path passes all three, the router returns two routes; if none does, it returns one. On Montreal's street grid there is almost always a parallel street of nearly the same length, so most trips get two routes, even trips under 1 km (1455 boulevard De Maisonneuve Ouest → Musée des beaux-arts: 564 m and 815 m). When one path clearly beats every other, the router returns only one, for example 1455 boulevard De Maisonneuve Ouest → Centre Bell (about 1.1 km). On short trips a detour is a bigger share of the trip, so single routes turned up mostly among short downtown trips, but not all of them. (These thresholds are how OSRM is generally described, not settings I could check on this exact server.)
+
 4. **Scoring with my data.** My map then scores every route it received: the % on protected lanes, km on poor pavement, repair stations within 200 m and problems readers reported within 50 m. It starts on the most protected route.
 
 **What this means for my feature:** my map can only choose among the routes the router suggests. It cannot find a more protected route the router did not offer, for example one 40% longer but fully on protected lanes. When the router returns one route, the page says so instead of inventing a choice. Making my own router from my bike-lane network would remove this limit, but it is a much bigger project.
 
-##Result notes: 
+### Searching: address suggestions
+After 3 letters and a short pause, the From and To boxes suggest up to 5 places from **Photon**, an OpenStreetMap search made for search-as-you-type (Nominatim's usage rules do not allow it). Only places on the island of Montreal are kept. A chosen suggestion already has its point, so it is not looked up again; text typed without choosing a suggestion is still looked up with Nominatim. "My location" is always the first suggestion in the From box.
+
+**Found in testing:** the suggestions worked in my first tests but showed nothing in my own browser. Photon answers in the browser's language, and my island check only knew the French name ("Agglomération de Montréal"); an English browser gets "Urban agglomeration of Montreal", so every result was filtered out. Fixed by always asking Photon for French names (`lang=fr`).
+
+**Limitation:** suggestions are always in French (e.g. "Montréal", "Rue Sainte-Catherine Ouest"), even for English-speaking readers.
+
+##Result notes##

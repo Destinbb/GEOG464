@@ -80,23 +80,22 @@
             <label for="route-from">From</label>
             <div class="route-row">
               <span class="clear-wrap">
-                <input id="route-from" type="text" placeholder="e.g. 4500 rue Saint-Denis" autocomplete="off" />
+                <input id="route-from" type="text" placeholder="e.g. 4500 rue Saint-Denis" autocomplete="off"
+                  role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="route-from-list" />
                 <button class="clear-button" type="button" data-clears="route-from" aria-label="Clear From" hidden>×</button>
+                <ul id="route-from-list" class="suggestions" role="listbox" aria-label="Suggestions for From" hidden></ul>
               </span>
-              <button id="route-use-location" type="button">My location</button>
             </div>
             <label for="route-to">To</label>
             <span class="clear-wrap">
-              <input id="route-to" type="text" placeholder="e.g. Atwater Market" autocomplete="off" />
+              <input id="route-to" type="text" placeholder="e.g. Atwater Market" autocomplete="off"
+                role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="route-to-list" />
               <button class="clear-button" type="button" data-clears="route-to" aria-label="Clear To" hidden>×</button>
+              <ul id="route-to-list" class="suggestions" role="listbox" aria-label="Suggestions for To" hidden></ul>
             </span>
             <button type="submit">Plan route</button>
             <div id="route-result" aria-live="polite"></div>
           </form>
-          <div class="locate-control">
-            <button id="locate-button" class="locate-button" type="button">Locate me</button>
-            <p class="locate-message" role="status" hidden></p>
-          </div>
         </div>
       </header>
 

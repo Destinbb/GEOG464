@@ -188,7 +188,7 @@ a {
   margin-bottom: 4px;
 }
 
-/* Route form laid out in one row: Plan a bike route: From [ ] [My location] To [ ] [Plan route] */
+/* Route form laid out in one row: Plan a bike route: From [ ] To [ ] [Plan route] */
 #route-form {
   display: flex;
   flex: 1;
@@ -211,32 +211,78 @@ a {
   min-width: 0;
 }
 
-/* "Locate me" button, next to the route form */
-.locate-control {
+/* "Locate me": a small crosshair button just above the + and − zoom buttons */
+.locate-map-control {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  max-width: 260px;
-  background: white;
-  border-radius: 4px;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+  align-items: flex-end;
+  gap: 4px;
 }
 
-.locate-button {
-  display: block;
-  padding: 6px 10px;
+.locate-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
   border: 0;
+  border-radius: 2px;
   background: white;
   color: var(--accent);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
   cursor: pointer;
 }
 
-.locate-button:hover,
-.locate-button:focus-visible {
+.locate-icon:hover,
+.locate-icon:focus-visible {
   background: #f1f5f9;
+}
+
+.locate-icon:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+/* Address suggestions under the From and To boxes */
+.suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1100; /* above the map and its controls */
+  width: max(100%, 300px);
+  max-width: calc(100vw - 32px);
+  max-height: 260px;
+  margin: 2px 0 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  font-size: 14px;
+}
+
+.suggestion {
+  padding: 6px 8px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.suggestion:hover,
+.suggestion.active {
+  background: #e5e7eb;
+}
+
+.suggestion-location {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.suggestion-note,
+.suggestion-note:hover {
+  background: none;
+  color: var(--muted);
+  cursor: default;
 }
 
 /* × clear buttons inside the From and To boxes */
@@ -297,8 +343,12 @@ a {
 }
 
 .locate-message {
+  max-width: 220px;
   margin: 0;
-  padding: 4px 10px 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
   font-size: 13px;
   color: #9b1c1c;
 }
@@ -353,21 +403,16 @@ a {
     width: 100%;
   }
 
-  /* The From box shares its row with "My location", so it takes the space left over */
+  /* The From box takes the whole row */
   .route-row .clear-wrap {
     flex: 1;
     min-width: 0;
   }
 
-  /* "Plan a route" and "Locate me" share one row; the form opens below them */
+  /* "Plan a route" fills the row; the form opens below it */
   .route-toggle {
     display: block;
     flex: 1;
-  }
-
-  .locate-control {
-    flex: 1;
-    max-width: none;
   }
 
   #route-form {
