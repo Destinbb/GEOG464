@@ -441,3 +441,17 @@ a {
   margin: 0 0 8px;
   max-width: 220px;
 }
+/* One button per suggested route; the chosen one is bold with a dark border */
+.route-choice {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.route-choice[aria-pressed="true"] {
+  font-weight: bold;
+  border: 2px solid #111827;
+}

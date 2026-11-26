@@ -103,6 +103,9 @@ map.createPane('routePane').style.zIndex = 450;
 map.getPane('routePane').style.pointerEvents = 'none';
 const routeLayer = L.layerGroup().addTo(map);
 
+// My data for scoring routes; filled in once the GeoJSON files have loaded
+const routeData = { lanes: [], repairStations: [] };
+
 // Nominatim reads French street words best, so expand common English forms: "Blvd W" -> "boulevard Ouest"
 function tidyAddress(text) {
   return text.trim()
@@ -152,7 +155,7 @@ function findPlace(text) {
 function findBikeRoute(start, end) {
   const url = 'https://routing.openstreetmap.de/routed-bike/route/v1/bike/' +
     start.lng + ',' + start.lat + ';' + end.lng + ',' + end.lat +
-    '?overview=full&geometries=geojson';
+    '?overview=full&geometries=geojson&alternatives=true';
   return fetch(url)
     .then(function (response) {
       if (!response.ok) {
@@ -164,12 +167,215 @@ function findBikeRoute(start, end) {
       if (result.code !== 'Ok' || result.routes.length === 0) {
         throw new Error('No bike route was found between these two places.');
       }
-      return result.routes[0];
+      return result.routes;
     });
 }
 
 function routePin(label) {
   return L.divIcon({ className: 'route-pin', html: label, iconSize: [24, 24] });
+}
+
+// ---------- Score each route with my own data ----------
+// Longitude/latitude to metres on a flat grid around Montreal (accurate to well under 1% across the city)
+const M_PER_DEG_LAT = 110540;
+const M_PER_DEG_LON = 111320 * Math.cos(45.5 * Math.PI / 180);
+function toMetres(lng, lat) {
+  return [lng * M_PER_DEG_LON, lat * M_PER_DEG_LAT];
+}
+
+// Shortest distance from point p to the straight piece a-b, all in metres
+function distanceToSegment(p, a, b) {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const lengthSquared = dx * dx + dy * dy;
+  let t = lengthSquared === 0 ? 0 : ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / lengthSquared;
+  t = Math.max(0, Math.min(1, t));   // stay between a and b
+  return Math.hypot(p[0] - (a[0] + t * dx), p[1] - (a[1] + t * dy));
+}
+
+// Shortest distance from point p to a line made of many pieces
+function distanceToLine(p, line) {
+  let shortest = Infinity;
+  for (let i = 1; i < line.length; i++) {
+    shortest = Math.min(shortest, distanceToSegment(p, line[i - 1], line[i]));
+  }
+  return shortest;
+}
+
+// Prepare every bike lane once: its points in metres, a box around it, whether it is protected,
+// and its pavement condition (looked up by ID_TRC; null when the survey has no record)
+function buildLaneIndex(laneFeatures, pavementFeatures) {
+  const pavementById = {};
+  pavementFeatures.forEach(function (feature) {
+    pavementById[feature.properties.ID_TRC] = feature.properties.pavement_condition;
+  });
+  const lanes = [];
+  laneFeatures.forEach(function (feature) {
+    const geometry = feature.geometry;
+    const parts = geometry.type === 'LineString' ? [geometry.coordinates] : geometry.coordinates;
+    parts.forEach(function (coordinates) {
+      const line = coordinates.map(function (c) { return toMetres(c[0], c[1]); });
+      const xs = line.map(function (p) { return p[0]; });
+      const ys = line.map(function (p) { return p[1]; });
+      lanes.push({
+        line: line,
+        minX: Math.min(...xs), maxX: Math.max(...xs),
+        minY: Math.min(...ys), maxY: Math.max(...ys),
+        protected: feature.properties.protected === 'Oui',
+        pavement: pavementById[feature.properties.ID_TRC] || null
+      });
+    });
+  });
+  return lanes;
+}
+
+const CHECK_EVERY = 20;   // metres between check points along a route
+const ON_LANE = 15;       // a check point this close to a bike lane counts as on it
+
+// Points every 20 m along a line (in metres), starting at its first point
+function checkPoints(line) {
+  const points = [];
+  let untilNext = 0;   // metres still to go before the next check point
+  for (let i = 1; i < line.length; i++) {
+    const a = line[i - 1];
+    const b = line[i];
+    const length = Math.hypot(b[0] - a[0], b[1] - a[1]);
+    let along = untilNext;
+    while (along <= length) {
+      const t = length === 0 ? 0 : along / length;
+      points.push([a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1])]);
+      along += CHECK_EVERY;
+    }
+    untilNext = along - length;
+  }
+  return points;
+}
+
+// What my data says about one route
+function scoreRoute(route) {
+  const line = route.geometry.coordinates.map(function (c) { return toMetres(c[0], c[1]); });
+  const points = checkPoints(line);
+  let onProtected = 0;
+  let onPoorPavement = 0;
+  points.forEach(function (p) {
+    let nearest = null;
+    let nearestDistance = ON_LANE;
+    routeData.lanes.forEach(function (lane) {
+      // Quick test first: skip lanes whose box is more than 15 m away
+      if (p[0] < lane.minX - ON_LANE || p[0] > lane.maxX + ON_LANE ||
+          p[1] < lane.minY - ON_LANE || p[1] > lane.maxY + ON_LANE) {
+        return;
+      }
+      const distance = distanceToLine(p, lane.line);
+      if (distance <= nearestDistance) {
+        nearest = lane;
+        nearestDistance = distance;
+      }
+    });
+    if (nearest && nearest.protected) onProtected += 1;
+    if (nearest && (nearest.pavement === 'Mauvais' || nearest.pavement === 'Très mauvais')) onPoorPavement += 1;
+  });
+
+  const repairStations = routeData.repairStations.filter(function (feature) {
+    const c = feature.geometry.coordinates;
+    return distanceToLine(toMetres(c[0], c[1]), line) <= 200;
+  }).length;
+
+  // Points readers added with memory.js: only problems and construction reports, within 50 m
+  const readerPoints = (window.memory && window.memory.points) || [];
+  const problems = readerPoints.filter(function (point) {
+    return (point.cat === 'problem' || point.cat === 'observation') &&
+      distanceToLine(toMetres(point.lng, point.lat), line) <= 50;
+  });
+
+  return {
+    protectedShare: points.length ? onProtected / points.length : 0,
+    poorPavementKm: onPoorPavement * CHECK_EVERY / 1000,
+    repairStations: repairStations,
+    problems: problems
+  };
+}
+
+// Draw every route the router found, scored with my data, and let the reader pick one
+function showRoutes(start, end, routes) {
+  const scored = routeData.lanes.length > 0;   // false if the bike lanes have not loaded yet
+  const scores = routes.map(function (route) { return scored ? scoreRoute(route) : null; });
+  let fastest = 0;
+  let mostProtected = 0;
+  routes.forEach(function (route, i) {
+    if (route.duration < routes[fastest].duration) fastest = i;
+    if (scored && scores[i].protectedShare > scores[mostProtected].protectedShare) mostProtected = i;
+  });
+
+  function draw(selected) {
+    routeLayer.clearLayers();
+    // The other routes: grey and dashed, underneath
+    routes.forEach(function (route, i) {
+      if (i === selected) return;
+      L.geoJSON(route.geometry, {
+        pane: 'routePane', interactive: false, style: { color: '#6b7280', weight: 4, opacity: 0.8, dashArray: '6, 6' }
+      }).addTo(routeLayer);
+    });
+    // The chosen route: white casing under a dark line so it stands out from the blue and pink lanes
+    L.geoJSON(routes[selected].geometry, {
+      pane: 'routePane', interactive: false, style: { color: '#ffffff', weight: 9, opacity: 0.9 }
+    }).addTo(routeLayer);
+    L.geoJSON(routes[selected].geometry, {
+      pane: 'routePane', interactive: false, style: { color: '#111827', weight: 5, opacity: 0.9 }
+    }).addTo(routeLayer);
+    L.marker(start.latlng, { icon: routePin('A'), title: 'Start: ' + start.name }).addTo(routeLayer);
+    L.marker(end.latlng, { icon: routePin('B'), title: 'End: ' + end.name }).addTo(routeLayer);
+    showResult(selected);
+  }
+
+  function showResult(selected) {
+    routeResult.textContent = '';
+    const heading = document.createElement('p');
+    heading.textContent = 'A: ' + start.name + '. B: ' + end.name + '.';
+    routeResult.append(heading);
+
+    routes.forEach(function (route, i) {
+      const labels = [];
+      if (routes.length > 1 && i === fastest) labels.push('fastest');
+      if (routes.length > 1 && scored && i === mostProtected) labels.push('most protected');
+      let text = 'Route ' + (i + 1) + (labels.length ? ' (' + labels.join(', ') + ')' : '') + ': ' +
+        (route.distance / 1000).toFixed(1) + ' km, about ' + Math.max(1, Math.round(route.duration / 60)) + ' min';
+      if (scored) {
+        const s = scores[i];
+        text += ', ' + Math.round(100 * s.protectedShare) + '% on protected lanes, ' +
+          s.poorPavementKm.toFixed(1) + ' km on poor pavement, ' +
+          s.repairStations + ' repair station' + (s.repairStations === 1 ? '' : 's') + ' within 200 m';
+      }
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'route-choice';
+      button.setAttribute('aria-pressed', String(i === selected));
+      button.textContent = text;
+      button.addEventListener('click', function () { draw(i); });
+      routeResult.append(button);
+    });
+
+    const note = document.createElement('p');
+    if (!scored) {
+      note.textContent = 'The bike-lane data has not loaded yet, so these routes are not scored. Try again in a moment.';
+    } else {
+      const problems = scores[selected].problems;
+      // Notes are typed by readers: show them as text (textContent), never as HTML
+      note.textContent = problems.length === 0
+        ? 'No problems reported by readers within 50 m of this route.'
+        : 'Reported by readers within 50 m of this route: ' +
+          problems.map(function (p) { return p.note || '(no note)'; }).join('; ') + '.';
+    }
+    routeResult.append(note);
+
+    const caveat = document.createElement('p');
+    caveat.textContent = (routes.length === 1 ? 'The router found only one route for this trip. ' : '') +
+      'The router suggests the routes; my map scores them. Pavement is only known where a bike lane matched the city survey.';
+    routeResult.append(caveat);
+  }
+
+  draw(scored ? mostProtected : fastest);
+  map.fitBounds(L.geoJSON(routes.map(function (r) { return r.geometry; })).getBounds().pad(0.1));
 }
 
 const routeForm = document.getElementById('route-form');
@@ -252,29 +458,12 @@ routeForm.addEventListener('submit', function (event) {
         .then(function (end) { return [start, end]; });
     })
     .then(function ([start, end]) {
-      return findBikeRoute(start.latlng, end.latlng).then(function (route) {
-        return [start, end, route];
+      return findBikeRoute(start.latlng, end.latlng).then(function (routes) {
+        return [start, end, routes];
       });
     })
-    .then(function ([start, end, route]) {
-      routeLayer.clearLayers();
-      // White casing under a dark line so the route stands out from the blue and pink lanes
-      L.geoJSON(route.geometry, {
-        pane: 'routePane', interactive: false, style: { color: '#ffffff', weight: 9, opacity: 0.9 }
-      }).addTo(routeLayer);
-      const line = L.geoJSON(route.geometry, {
-        pane: 'routePane', interactive: false, style: { color: '#111827', weight: 5, opacity: 0.9 }
-      }).addTo(routeLayer);
-      L.marker(start.latlng, { icon: routePin('A'), title: 'Start: ' + start.name }).addTo(routeLayer);
-      L.marker(end.latlng, { icon: routePin('B'), title: 'End: ' + end.name }).addTo(routeLayer);
-      map.fitBounds(line.getBounds().pad(0.1));
-
-      const km = (route.distance / 1000).toFixed(1);
-      const minutes = Math.max(1, Math.round(route.duration / 60));
-      routeResult.textContent =
-        'A: ' + start.name + '. B: ' + end.name + '. ' +
-        km + ' km, about ' + minutes + ' min by bike (black line). ' +
-        'The route prefers bike paths but does not pick protected lanes on purpose: blue lines along it are protected.';
+    .then(function ([start, end, routes]) {
+      showRoutes(start, end, routes);
     })
     .catch(function (err) {
       routeResult.textContent = err.message;
@@ -326,6 +515,10 @@ Promise.all([
   })
 ])
   .then(function ([data, pavementData, repairData]) {
+    // Give the route planner my bike lanes, pavement and repair stations for scoring
+    routeData.lanes = buildLaneIndex(data.features, pavementData.features);
+    routeData.repairStations = repairData ? repairData.features : [];
+
     const protectedCount = data.features.filter(function (feature) {
       return feature.properties.protected === 'Oui';
     }).length;

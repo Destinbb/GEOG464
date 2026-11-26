@@ -91,7 +91,7 @@
               <button class="clear-button" type="button" data-clears="route-to" aria-label="Clear To" hidden>×</button>
             </span>
             <button type="submit">Plan route</button>
-            <p id="route-result" aria-live="polite"></p>
+            <div id="route-result" aria-live="polite"></div>
           </form>
           <div class="locate-control">
             <button id="locate-button" class="locate-button" type="button">Locate me</button>
@@ -114,7 +114,7 @@
     <script src="remember.js"></script>
     <script src="app.js"></script>
     <script src="memory.js"></script>
-    <script>addMemory(map);</script>
+    <script>window.memory = addMemory(map);</script>
     
     <script>rememberView(map);</script>
   </body>
