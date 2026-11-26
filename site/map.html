@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Montreal Bicycle Network</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚲</text></svg>" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="top">
+        <div class="title-row">
+          <h1>Montreal: Bicycle Network</h1>
+
+          <!-- Back to the landing page (index.html) -->
+          <a class="home-link" href="index.html">← Back to home</a>
+
+          <!-- Small tabs: each opens one block of information; clicking it again closes it -->
+          <nav class="tabs" aria-label="About this map">
+            <button type="button" class="tab" aria-expanded="false" aria-controls="panel-about">About</button>
+            <button type="button" class="tab" aria-expanded="false" aria-controls="panel-how">How to use</button>
+            <button type="button" class="tab" aria-expanded="false" aria-controls="panel-data">Data sources</button>
+            <button type="button" class="tab" aria-expanded="false" aria-controls="panel-ai">How AI was used</button>
+          </nav>
+        </div>
+
+        <section id="panel-about" class="tab-panel" hidden>
+          <p class="lede">Bicycle commuting offers a relatively low-cost, healthy and environmentally friendly alternative to motorized transportation. However, for people who are new to cycling or unfamiliar with Montreal, navigating the city's cycling infrastructure can be intimidating. Furthermore, protected bike routes that offer a physical barrier between the bike lane and vehicle traffic can provide a safer commuting experience. Understanding where bike routes are located and which types of infrastructure they offer can help people make more informed decisions about their commute.</p>
+          <p><strong>This map is for:</strong> Cyclists in Montreal who may not be familiar with the city's bike-lane infrastructure.</p>
+        </section>
+
+        <section id="panel-how" class="tab-panel" hidden>
+          <p><strong>What you can do here:</strong> Press <strong>Locate me</strong> to see where you are on the map, or type a start and end address to plan a bike route from A to B. Click a road segment to see its details. Compare protected and unprotected bike routes by toggling the visibility of each layer. Popup information for each segment explains its type, area, protection status, seasonal status, and recorded length. Users can also click a pavement segment for its Pavement Condition Index score and survey date. The pavement rating describes the surveyed street segment matched to this route by ID_TRC; it may not represent the bike lane’s surface specifically as the data is from 2024.</p>
+        </section>
+
+        <section id="panel-data" class="tab-panel" hidden>
+          <p id="status">Loading bike-lane data...</p>
+          <ul>
+            <li>
+              <a href="https://www.donneesquebec.ca/recherche/dataset/vmtl-pistes-cyclables">Réseau cyclable</a>,
+                City of Montréal, licensed under
+              <a href="https://www.donneesquebec.ca/licence/#cc-by">CC BY 4.0</a>.
+              Accessed October 1, 2026. For this MVP, I kept every route on the island of Montréal
+              (the City of Montréal's boroughs and the linked municipalities), removed records with missing geometry or
+              required fields, and kept the geometry plus selected properties. I renamed
+              those property keys in English but the source values themselves remain unchanged.
+            </li>
+            <li>
+              Bike repair stations: <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap contributors</a>,
+              licensed under the Open Database License (ODbL). Downloaded with Overpass Turbo
+              (<code>amenity=bicycle_repair_station</code> within Montréal). Accessed November 2, 2026.
+            </li>
+            <li>
+              <a href="https://donnees.montreal.ca/dataset/condition-chaussees-reseau-routier">Indicateurs de condition des chaussées du réseau routier</a>,
+                City of Montréal, licensed under
+              <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+              Accessed October 23, 2026. I joined each street's pavement condition category,
+              PCI score and survey date to the bike network by street segment (ID_TRC), and the
+              pavement layer shows only the bike routes that matched a survey record.
+            </li>
+            <li>
+              Route planning: addresses are found with <a href="https://nominatim.org">Nominatim</a> and bike routes come from
+              the <a href="https://routing.openstreetmap.de/about.html">FOSSGIS OSRM bike routing server</a>, both using
+              <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> data. The addresses you type (and your location,
+              if you choose "My location") are sent to these services to plan the route. "Locate me" uses your browser's location
+              and does not send it anywhere.
+            </li>
+          </ul>
+        </section>
+
+        <section id="panel-ai" class="tab-panel" hidden>
+          <p>I used GitHub Copilot with gpt-6-luna to help load and clean GeoJSON data from Données Québec's open-data portal. I used the agent to filter the scope of the data by only keeping features where VILLE_MTL = Oui. I later used Claude Code to widen this to every route on the island of Montreal, including the linked municipalities such as Westmount and Dorval. I also used the agent to remove features with missing geometry or required fields, count the exclusions and translate the selected property keys from French to English for the map. Finally I used the agent to split the data into protected and unprotected layers. I reviewed the filtered GeoJSON and made sure that only routes on the island of Montreal and with required fields were displayed on the map. I also checked that the English translations preserved the meaning of the original values. Finally, I confirmed that all segments were correctly classified into the protected and unprotected layers, and were displayed correctly on the map. I also tested the page by toggling the visibility of each layer and opening the popups to ensure they displayed the feature information.</p>
+        </section>
+
+        <!-- Plan a route and Locate me, in one row at the top -->
+        <div class="tools">
+          <!-- Phones only: the route form folds up behind this button -->
+          <button id="route-toggle" class="route-toggle" type="button" aria-expanded="false" aria-controls="route-form">Plan a route</button>
+          <form id="route-form">
+            <strong class="route-title">Plan a bike route:</strong>
+            <label for="route-from">From</label>
+            <div class="route-row">
+              <span class="clear-wrap">
+                <input id="route-from" type="text" placeholder="e.g. 4500 rue Saint-Denis" autocomplete="off"
+                  role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="route-from-list" />
+                <button class="clear-button" type="button" data-clears="route-from" aria-label="Clear From" hidden>×</button>
+                <ul id="route-from-list" class="suggestions" role="listbox" aria-label="Suggestions for From" hidden></ul>
+              </span>
+            </div>
+            <label for="route-to">To</label>
+            <span class="clear-wrap">
+              <input id="route-to" type="text" placeholder="e.g. Atwater Market" autocomplete="off"
+                role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="route-to-list" />
+              <button class="clear-button" type="button" data-clears="route-to" aria-label="Clear To" hidden>×</button>
+              <ul id="route-to-list" class="suggestions" role="listbox" aria-label="Suggestions for To" hidden></ul>
+            </span>
+            <button type="submit">Plan route</button>
+            <div id="route-result" aria-live="polite"></div>
+          </form>
+        </div>
+      </header>
+
+      <form id="search-form">
+        <p class="map-hint"><strong>Click any route</strong> for its details. Turn on <strong>Pavement condition</strong> (top right) to see road quality.</p>
+        <label for="search-input">Find protected routes in a neighbourhood:</label>
+        <input id="search-input" type="search" placeholder="e.g. Verdun, Plateau" />
+        <button type="submit">Search</button>
+        <p id="search-result"></p>
+      </form>
+      <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="remember.js"></script>
+    <script src="app.js"></script>
+    <script src="memory.js"></script>
+    <script>window.memory = addMemory(map);</script>
+    
+    <script>rememberView(map);</script>
+  </body>
+</html>

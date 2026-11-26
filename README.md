@@ -1,6 +1,6 @@
 # Montreal Bike Lanes
 
-[Link to the site](https://destinbb.github.io/GEOG464/site/)
+[Link to the site](https://destinbb.github.io/GEOG464/site/) (landing page) · [Straight to the map](https://destinbb.github.io/GEOG464/site/map.html)
 
 ## The five sentences
 
@@ -27,7 +27,7 @@ After adding my second data layer, I feel like I really have to work on the core
 
 1. Open the `GEOG464` folder in VS Code.
 2. Open `notebooks/TermProject.ipynb` and run every cell from top to bottom. It reads the raw GeoJSON, reports exclusions, rounds coordinates to 5 decimals, writes `bike_lanes_clean_english.geojson`, and finishes with count, geometry-extent, geometry-type, property and file-size (under 5 MB) checks.
-3. Right-click `site/index.html` and choose **Open with Live Server**. The page fetches the notebook output from `../data/bike_lanes_clean_english.geojson`
+3. Right-click `site/index.html` (the landing page) or `site/map.html` (the map) and choose **Open with Live Server**. The map fetches the notebook output from `../data/bike_lanes_clean_english.geojson`
 4. Use the map layer checkboxes to show or hide protected lanes. Click a line for its attributes.
 
 ## How AI was used - green lane
@@ -194,3 +194,38 @@ After 3 letters and a short pause, the From and To boxes suggest up to 5 places 
 **Limitation:** suggestions are always in French (e.g. "Montréal", "Rue Sainte-Catherine Ouest"), even for English-speaking readers.
 
 ##Result notes##
+
+
+# Heuristic review: what I changed and why
+A review of my map against Nielsen's 10 usability heuristics found that my map's colours did not mean what a cyclist expects: the city's `protected` field (`PROTEGE_4S`) behaves like "protected **and** kept open all winter". 2,561 of the 2,565 "protected" segments are also year-round, while 1,027 dedicated bike paths and 521 multi-use trails (no cars at all, e.g. the Lachine Canal) show as "not identified as protected". I am fixing this and the other findings in phases, each tested and committed on its own.
+
+| # | Finding | Heuristic | Status | Phase |
+| --- | --- | --- | --- | --- |
+| 1 | No landing page; the map opens with no explanation | Help and documentation | Planned | 0 |
+| 2 | "Protected" really means protected and year-round; colour lanes by comfort level (separated from cars, painted lane, shared with traffic) from `facility_type` | Match with the real world | Planned | 1 |
+| 3 | Add a "Year-round routes only" filter using `year_round` | Flexibility and efficiency | Planned | 1 |
+| 4 | Permanent small legend for lane types (today only the pavement legend appears, and only when that layer is on) | Recognition rather than recall | Planned | 1 |
+| 5 | Loading message hidden in a panel; show a spinner on the map | Visibility of system status | Planned | 2 |
+| 6 | Popups: lengths over 1,000 m in km; plain words instead of "PCI" and "ID_TRC" | Match with the real world | Planned | 2 |
+| 7 | Clear route button; Esc closes the info tabs; swap A/B button | User control and freedom | Planned | 2 |
+| 8 | Report colours (#1f77b4, #1b1b9e) too close to the lanes' blue | Consistency and standards | Planned | 2 |
+| 9 | Too many boxes on the map: move the hint off the map, a "Show pavement" switch, fold "Add a point" into one button, show "My repair stations" only once something is saved, lighter basemap | Aesthetic and minimalist design | Planned | 3 |
+| 10 | Suggestions as you type, limited to Montreal | Error prevention | Done (address suggestions, see above) | – |
+| 11 | Say why routing failed and what to try | Help users recover from errors | Done already ("Could not find … Try a street address, e.g. …") | – |
+| 12 | Enter in the To box plans the route | Flexibility and efficiency | Done already (the route boxes are a form) | – |
+| 13 | Collision data: how many collisions lie along each route | New data | Planned | 4 |
+| 14 | Slope: how steep each street or route is (%), e.g. near Mont-Royal | New data | Planned | 5 |
+
+## Phase 0: landing page
+The site now opens on a landing page (`site/index.html`) that says who the map is for, what it can do and how to read it, with buttons to the map. The map itself moved to `site/map.html`.
+
+### Tests (written before the code)
+| # | What I do | Expected | Result |
+| --- | --- | --- | --- |
+| 0.1 | Open the live link https://destinbb.github.io/GEOG464/site/ | The landing page opens, with a screenshot of the map and no broken image. | Passed|
+| 0.2 | Press each "Open the map" / "Try it now" button and the "Skip to the map" link (Tab key from the top of the page) | Each one opens the map. |Passed |
+| 0.3 | Before the change, save a repair station and move the map; after the change, open the map | The saved station and the last view are still there (they are stored per folder, and the folder did not change). | Passed|
+| 0.4 | Read the landing page text against the map | Nothing promises what the map does not do: at most two routes, and the privacy note names Photon, Nominatim and OSRM. | Passed|
+| 0.5 | Open the landing page on a phone | One column, readable, no sideways scrolling. | |
+| 0.6 | Lighthouse Accessibility on the landing page | 100, or a list of what to fix. | |
+| 0.7 | On the map, press "← Back to home" (also with Tab and Enter) | The landing page opens; the browser's back button returns to the map. | |
