@@ -258,3 +258,23 @@ The site now opens on a landing page (`site/index.html`) that says who the map i
 | 1.7 | Plan Oratoire Saint-Joseph → Marché Jean-Talon | Route buttons show "% separated from cars", "% on painted lanes" and "% open year-round", and the label "most separated". | |
 | 1.8 | Press Tab through the layer box | The "Year-round routes only" checkbox can be reached and ticked with the keyboard. | |
 | 1.9 | Compare the landing page legend and the "How to use" tab with the map | Same three levels, colours and words. | |
+
+## Phase 2: small fixes
+Four small changes from the heuristic review (items 5 to 8):
+- **2.1 Loading message on the map** (visibility of system status): the only loading message was hidden in the closed Data sources tab, so the map looked empty for a few seconds. A small box with a spinner and "Loading bike lanes…" now shows on the map until the data arrives.
+- **2.2 Plain words in popups** (match with the real world): lengths of 1,000 m or more show in km (30 segments are over 1 km; the longest is 2,406 m), "PCI score" becomes "Pavement score: 75 out of 100", and "ID_TRC" becomes "the city's street segment number" outside the Data sources tab.
+- **2.3 Clear route, Esc and Swap** (user control and freedom): a "Clear route" button removes a drawn route but keeps the addresses; Esc closes an open info tab; a "⇅ Swap" button swaps From and To.
+- **2.4 Report points that do not look like lanes** (consistency and standards): the report colours (#1f77b4 and #1b1b9e) looked like the painted and separated lanes. Each report type now has its own shape, symbol and colour: orange triangle "!" (route variability, construction), red square "✕" (something is wrong), purple circle with a lightbulb (idea).
+
+### Tests (written before the code)
+| # | What I do | Expected | Result |
+| --- | --- | --- | --- |
+| 2.1a | DevTools, Network, "Slow 3G", reload the map | A box with a spinner and "Loading bike lanes…" shows on the map until the lanes appear, then disappears. | |
+| 2.1b | Block `bike_lanes_clean_english.geojson` in DevTools and reload | The loading box disappears and the error message "The bike-lane data could not be loaded…" shows instead. | |
+| 2.2a | Click a lane over 1 km long (e.g. a long multi-use trail) and a short one | The long one shows its length in km (e.g. "2.4 km"); the short one in m (e.g. "326 m"). | |
+| 2.2b | Turn on Pavement condition and click a segment | "Pavement score: [number] out of 100 (higher is better)" and "Surveyed: [date]"; no "PCI" or "ID_TRC" in the popups or the How to use tab. | |
+| 2.3a | Plan a route, then press "Clear route" | The lines, pins and results disappear; the From and To addresses stay. | |
+| 2.3b | Open the "How to use" tab, then press Esc | The tab closes and the keyboard focus is back on its button. With a suggestion list open, Esc closes only the list. | |
+| 2.3c | Type a From and a To, press "⇅ Swap", then Plan route | From and To change places, and the route is planned in the other direction. | |
+| 2.4a | Add one point of each type | An orange triangle "!", a red square "✕" and a purple circle with a lightbulb; none looks like a lane colour. The panel key shows the same shapes. | |
+| 2.4b | Open each new point's popup | Its category and note show, and "Delete my point" still works. | |
