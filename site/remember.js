@@ -100,15 +100,20 @@ function rememberMarks(map, layer, options) {
     return String(p[nameField] !== undefined ? p[nameField] : id);
   }
 
-  function drawPanel() {
+  function drawPanel(message) {
     panel.textContent = "";
+    // Favourites: hide the whole box until something is saved, so it does not cover the map for nothing
+    // (each place's popup has its own "Save" button). A message, e.g. "This browser would not save it",
+    // still shows the box. Saved places no longer in the data do not count.
+    const saved = marked.filter((id) => byId[id]);
+    panel.hidden = !progress && saved.length === 0 && !message;
     const h = document.createElement("strong");
     h.textContent = o.title || (progress ? "Progress" : "My places");
     const status = document.createElement("div");
     status.setAttribute("role", "status");
     status.style.margin = "4px 0";
-    status.textContent = progress ? (marked.length + " of " + total + " visited")
-                                  : (marked.length ? marked.length + " saved" : "Open a place and press Save to add it here");
+    status.textContent = message || (progress ? (marked.length + " of " + total + " visited")
+                                              : saved.length + " saved");
     const ul = document.createElement("ul");
     ul.style.cssText = "margin:0;padding-left:18px";
     for (const id of marked) {
@@ -131,11 +136,14 @@ function rememberMarks(map, layer, options) {
   function toggle(id) {
     const before = marked;
     marked = marked.includes(id) ? marked.filter((x) => x !== id) : marked.concat([id]);
-    if (!geog464Save(key, marked)) { marked = before; alertBox("This browser would not save it (private window?)"); }
+    if (!geog464Save(key, marked)) {
+      marked = before;
+      drawPanel("This browser would not save it (private window?)");   // shows the box even if nothing is saved
+      return;
+    }
     drawPanel();
   }
 
-  function alertBox(text) { panel.querySelector('[role="status"]').textContent = text; }
 
   // Add a button to each popup when it opens, so your own popup content stays as it is.
   layer.on("popupopen", (e) => {

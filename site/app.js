@@ -1,10 +1,20 @@
 const map = L.map('map', { preferCanvas: true }).setView([45.51, -73.57], 11);
 map.zoomControl.setPosition('bottomright');
 
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// Basemap: Esri World Topographic. Light, natural colours (green parks, blue water, white and grey streets)
+// that do not clash with the lane, pavement and report colours, and it shows terrain.
+// Free with no account for non-commercial use; Esri asks for the credit below. Its full source list is long,
+// so (like Esri's own Leaflet plugin) the map shows a short credit and the full list appears on hover over "others".
+// The full credit is also in the Data sources tab.
+const ESRI_SOURCES = 'Sources: Esri, HERE, Garmin, Intermap, increment P Corp., GEBCO, USGS, FAO, NPS, NRCAN, GeoBase, IGN, ' +
+  'Kadaster NL, Ordnance Survey, Esri Japan, METI, Esri China (Hong Kong), (c) OpenStreetMap contributors, and the GIS User Community';
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}', {
   maxZoom: 19,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  attribution: 'Tiles &copy; <a href="https://www.esri.com">Esri</a> &mdash; Sources: Esri, HERE, Garmin, USGS and ' +
+    '<abbr title="' + ESRI_SOURCES + '">others</abbr>'
 }).addTo(map);
+// The routes, addresses and repair stations come from OpenStreetMap data
+map.attributionControl.addAttribution('&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors');
 map.attributionControl.addAttribution(
   'Routing: <a href="https://routing.openstreetmap.de/about.html">FOSSGIS OSRM</a>, ' +
   'addresses: <a href="https://nominatim.org">Nominatim</a>'

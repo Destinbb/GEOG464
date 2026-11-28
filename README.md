@@ -286,14 +286,14 @@ Review item 9 (aesthetic and minimalist design): five boxes covered the map (Res
 - **3.2 "Show pavement" button:** a small button under Reset view turns the pavement layer on and off ("Show pavement" / "Hide pavement") and stays in step with the layer box.
 - **3.3 "Report or suggest":** the Add a point panel starts folded as one button; pressing it opens the full panel. The status line ("Shared: 3 points", or an error) stays visible next to the button.
 - **3.4 "My repair stations" only once something is saved:** the box is hidden while nothing is saved.
-- **3.5 Lighter basemap:** CARTO Positron instead of greyed-out OpenStreetMap tiles, so the lanes and icons stand out (attribution: © OpenStreetMap contributors © CARTO).
+- **3.5 New basemap:** I first tried CARTO Positron, but it now needs an account, so I compared six free basemaps instead and chose **Esri World Topographic**. Its colours (green parks, blue water) make the bike lanes stand out, and it shows hills for the slope phase later.
 
 ### Tests (written before the code)
 | # | What I do | Expected | Result |
 | --- | --- | --- | --- |
-| 3.1 | Open the map | No "Click any route…" hint on the map; the neighbourhood search is one line with its button. | |
-| 3.2 | Press "Show pavement", then untick "Pavement condition" in the layer box | The pavement layer and its legend appear and the button says "Hide pavement"; after unticking, both are gone and the button says "Show pavement" again. | |
-| 3.3 | Open the map, press "Report or suggest", add a point, press it again | It starts folded with the status visible; it opens to the full panel; adding a point still works; it folds again. With the keyboard, Tab and Enter open and close it. | |
-| 3.4 | Open the map with nothing saved, save a repair station, then remove it | No "My repair stations" box at first; it appears after saving; it disappears again after removing the last station. | |
-| 3.5 | Compare the before and after screenshots | The map is lighter and the lanes stand out more; the attribution shows © CARTO. | |
+| 3.1 | Open the map | No "Click any route…" hint on the map; the neighbourhood search is one line with its button. | Passed|
+| 3.2 | Press "Show pavement", then untick "Pavement condition" in the layer box | The pavement layer and its legend appear and the button says "Hide pavement"; after unticking, both are gone and the button says "Show pavement" again. | Passed|
+| 3.3 | Open the map, press "Report or suggest", add a point, press it again | It starts folded with the status visible; it opens to the full panel; adding a point still works; it folds again. With the keyboard, Tab and Enter open and close it. |Passed |
+| 3.4 | Open the map with nothing saved, save a repair station, then remove it | No "My repair stations" box at first; it appears after saving; it disappears again after removing the last station. | Passed|
+| 3.5 | Compare the before and after screenshots | The lanes stand out more on the new basemap; the map credits Esri. | |
 | 3.6 | Count the boxes on the map | Before: five boxes. After: Reset view, Show pavement, a one-line search, the layer box and one "Report or suggest" button. | |

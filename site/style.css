@@ -149,9 +149,6 @@ h2 {
 a {
   color: var(--accent);
 }
-.leaflet-tile-pane {
-  filter: grayscale(100%);
-}
 #map {
   flex: 1;
   min-height: 420px;
