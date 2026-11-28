@@ -297,3 +297,32 @@ Review item 9 (aesthetic and minimalist design): five boxes covered the map (Res
 | 3.4 | Open the map with nothing saved, save a repair station, then remove it | No "My repair stations" box at first; it appears after saving; it disappears again after removing the last station. | Passed|
 | 3.5 | Compare the before and after screenshots | The lanes stand out more on the new basemap; the map credits Esri. | |
 | 3.6 | Count the boxes on the map | Before: five boxes. After: Reset view, Show pavement, a one-line search, the layer box and one "Report or suggest" button. | |
+
+## Phase 4: bike collisions
+**The data:** [Collisions routières](https://donnees.montreal.ca/dataset/collisions-routieres), City of Montréal (police collision reports from the SAAQ), licensed under CC BY 4.0, accessed November 28, 2026. The portal says it was updated in August 2026, but **the newest year in the file is 2021**, so the map says "2017–2021" everywhere.
+
+**The cleaning (notebook):** the raw CSV (218,272 collisions, 82 MB) stays out of GitHub in `data/raw/` (see `.gitignore`); to rebuild, download the CSV from the link above into `data/raw/`. The notebook keeps collisions where **a bike was involved** (`nb_bicyclette` > 0 or a cyclist victim), from **2017 to 2021**, with a good location accuracy rating (`LOC_COTE_PD` 1 or 2), and writes `data/bike_collisions.geojson` with the year, date, severity in English, cyclists killed and injured, and street.
+
+| | Count |
+| --- | --- |
+| Collisions with a bike involved, 2012–2021 | 8,685 |
+| … 2017–2021 | 3,783 |
+| … with a good location (kept) | **3,687** (96 dropped) |
+| By year (kept) | 2017: 917 · 2018: 771 · 2019: 709 · 2020: 588 · 2021: 702 |
+| By severity (kept) | Fatal 12 · Serious injury 107 · Minor injury 2,726 · Property damage only 842 |
+| Cyclists killed / injured (kept) | 12 / 2,829 |
+
+**On the map:** a "Bike collisions (2017–2021)" layer (off at the start) and, on each route button, the number of bike collisions within 25 m of the route and per km.
+
+**Limit:** the data counts collisions, not risk. More collisions on a street can mean more people cycle there, not that it is more dangerous per trip. The years 2020 and 2021 are lower, probably partly because of COVID.
+
+### Tests (written before the code)
+| # | What I do | Expected | Result |
+| --- | --- | --- | --- |
+| 4.1a | Run the notebook's collision cells | It reports 3,687 collisions kept (917 / 771 / 709 / 588 / 702 by year), 96 dropped for location accuracy, and the checks pass: every point is a Point inside Montreal, every feature has year, severity and the cyclist counts, and the file is under 5 MB. | |
+| 4.1b | Check `git status` after running the notebook | `data/raw/collisions_routieres.csv` does not appear (ignored); `data/bike_collisions.geojson` does. | |
+| 4.2a | Turn on "Bike collisions (2017–2021)" in the layer box | Small dark grey dots appear; serious and fatal collisions are larger and darker. It is off when the map opens. | |
+| 4.2b | Click a collision | Popup: "Collision involving a bike", the year and date, the severity in English, the number of cyclists killed or injured, and the street (or "street not recorded"). | |
+| 4.3a | Plan Oratoire Saint-Joseph → Marché Jean-Talon | Each route button also shows "N bike collisions within 25 m (2017–2021)" and the number per km. | |
+| 4.3b | Edge: plan a route where no collisions are recorded nearby (e.g. a short trip in a park) | "0 bike collisions within 25 m", no error. | |
+| 4.4 | Open the Data sources tab and the How to use tab | The collision data is credited (City of Montréal / SAAQ, CC BY 4.0, 2012–2021); the page says collisions are counts, not risk. | |
