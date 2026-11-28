@@ -334,16 +334,16 @@ Review item 9 (aesthetic and minimalist design): five boxes covered the map (Res
 | 4.4 | Open the Data sources tab and the How to use tab | The collision data is credited (City of Montréal / SAAQ, CC BY 4.0, 2012–2021); the page says collisions are counts, not risk. |Passed |
 
 ## Phase 5: slope
-Adds how steep each bike lane is, a "Steep sections" layer, and the climb on each planned route. Lanes under 50 m are not measured (bridges gave false slopes). Example: Oratoire → Jean-Talon, Route 1 climbs about 20 m, Route 2 about 95 m (over Mont-Royal).
+Adds how steep each bike lane is, a "Steep sections" layer, and the climb on each planned route. Lanes under 50 m are not measured (bridges gave false slopes). Example: Oratoire → Jean-Talon, Route 1 climbs about 7 m, Route 2 about 84 m (over Mont-Royal).
 
 ### Tests (written before the code)
 | # | What I do | Expected | Result |
 | --- | --- | --- | --- |
-| 5.1 | Run the notebook's slope cells | Checks pass; 6,938 lanes measured; files under 5 MB. | |
-| 5.2a | Click a hilly lane and a flat lane | Popups show the slope (e.g. "steep" / "gentle"). | |
-| 5.2b | Click a lane under 50 m | "Slope: too short to measure". | |
-| 5.2c | Turn on "Steep sections (over 6%)" | 77 lanes highlighted; off at the start. | |
-| 5.3a | Plan Oratoire Saint-Joseph → Marché Jean-Talon | Route 1 about 20 m of climbing, Route 2 about 95 m. | |
-| 5.3b | Edge: plan a flat trip (e.g. Lachine Canal) | About 0 m of climbing, no error. | |
-| 5.3c | Edge: block `elevation_grid.bin` and plan a route | Route still shows, without the climb, no error. | |
+| 5.1 | Run the notebook's slope cells | Checks pass; 6,938 lanes measured; files under 5 MB. |Passed |
+| 5.2a | Click a hilly lane and a flat lane | Popups show the slope (e.g. "steep" / "gentle"). |Passed |
+| 5.2b | Click a lane under 50 m | "Slope: too short to measure". | Passed|
+| 5.2c | Turn on "Steep sections (over 6%)" | 77 lanes highlighted; off at the start. |Passed |
+| 5.3a | Plan Oratoire Saint-Joseph → Marché Jean-Talon | Route 1 about 20 m of climbing, Route 2 about 95 m. |Passed. Later fixed small height errors adding up; now Route 1 ↑ 7 m, Route 2 ↑ 84 m. |
+| 5.3b | Edge: plan a flat trip (e.g. Lachine Canal) | About 0 m of climbing, no error. | Marche Atwater to Joe Beef: Passed|
+| 5.3c | Edge: block `elevation_grid.bin` and plan a route | Route still shows, without the climb, no error. | Passed|
 | 5.4 | Open Data sources and How to use | NRCan is credited; bridges note shown. | |

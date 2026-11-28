@@ -40,6 +40,7 @@
             <li><span class="layer-swatch shared" aria-hidden="true"></span><strong>Shared with traffic</strong> (thin dashed pink): no lane of your own; you ride in the street with cars or buses. Off at the start.</li>
           </ul>
           <p><span class="layer-swatch collision" aria-hidden="true"></span><strong>Bike collisions (2017–2021):</strong> turn them on in the layer menu; bigger, darker dots were more serious. Each planned route also counts the bike collisions within 25 m of it. These are counts, not risk: a street with more collisions may simply have more people cycling on it, so it is not necessarily more dangerous per trip.</p>
+          <p><span class="layer-swatch steep" aria-hidden="true"></span><strong>Slope:</strong> click a lane to see how steep it is (gentle under 3%, moderate 3–6%, steep 6–10%, very steep over 10%), or turn on <strong>Steep sections (over 6%)</strong> in the layer menu. Each planned route also shows its climbing. Heights are bare ground, so bridges and overpasses are not included: slopes on them are not measured, and very short lanes say "too short to measure".</p>
         </section>
 
         <section id="panel-data" class="tab-panel" hidden>
@@ -80,6 +81,13 @@
               <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Accessed November 28, 2026.
               The file covers 2012 to 2021. I kept the 3,687 collisions from 2017 to 2021 where a bike was involved and
               the location is accurate, and translated the severity into English.
+            </li>
+            <li>
+              Slope: <a href="https://open.canada.ca/data/en/dataset/0fe65119-e96e-4a57-8bfe-9d9245fba06b">High Resolution Digital Elevation Model Mosaic (HRDEM)</a>,
+              Natural Resources Canada, licensed under the
+              <a href="https://open.canada.ca/en/open-government-licence-canada">Open Government Licence – Canada</a>.
+              Accessed November 28, 2026. Bare-ground heights from lidar, read for Montreal only and averaged to 10 m
+              (lanes) and 40 m (route climbing).
             </li>
             <li>
               Basemap: <a href="https://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f">World Topographic Map</a>,

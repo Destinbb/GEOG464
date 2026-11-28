@@ -1,0 +1,11 @@
+{
+ "west": -73.98,
+ "north": 45.71,
+ "cell_lon": 0.0005,
+ "cell_lat": 0.00036,
+ "cols": 1020,
+ "rows": 861,
+ "units": "decimetres",
+ "nodata": -32768,
+ "source": "NRCan HRDEM Mosaic (DTM), Open Government Licence - Canada"
+}

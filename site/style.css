@@ -225,6 +225,13 @@ a {
   height: 10px;
 }
 
+/* Steep sections: a wide see-through red band, like the highlight on the map */
+.layer-swatch.steep {
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(215, 48, 31, 0.45);
+}
+
 /* Bike collisions: a small dark grey dot, like the dots on the map */
 .layer-swatch.collision {
   width: 9px;

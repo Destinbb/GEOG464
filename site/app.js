@@ -178,7 +178,8 @@ map.getPane('routePane').style.pointerEvents = 'none';
 const routeLayer = L.layerGroup().addTo(map);
 
 // My data for scoring routes; filled in once the GeoJSON files have loaded
-const routeData = { lanes: [], repairStations: [], collisions: null };   // collisions stay null if their file fails
+// collisions and elevation stay null if their files fail
+const routeData = { lanes: [], repairStations: [], collisions: null, elevation: null };
 
 // Nominatim reads French street words best, so expand common English forms: "Blvd W" -> "boulevard Ouest"
 function tidyAddress(text) {
@@ -327,6 +328,57 @@ function checkPoints(line) {
 }
 
 // What my data says about one route
+// Height (m) at a point given in metres (from toMetres), blended from the 4 nearest cells of the 40 m grid.
+// Returns null outside the grid or where it has no height.
+function heightAt(p) {
+  const g = routeData.elevation;
+  const lon = p[0] / M_PER_DEG_LON;
+  const lat = p[1] / M_PER_DEG_LAT;
+  const col = (lon - g.info.west) / g.info.cell_lon - 0.5;
+  const row = (g.info.north - lat) / g.info.cell_lat - 0.5;
+  const c0 = Math.floor(col);
+  const r0 = Math.floor(row);
+  if (c0 < 0 || r0 < 0 || c0 + 1 >= g.info.cols || r0 + 1 >= g.info.rows) return null;
+  const dc = col - c0;
+  const dr = row - r0;
+  const z = [g.heights[r0 * g.info.cols + c0], g.heights[r0 * g.info.cols + c0 + 1],
+    g.heights[(r0 + 1) * g.info.cols + c0], g.heights[(r0 + 1) * g.info.cols + c0 + 1]];
+  if (z.includes(g.info.nodata)) return null;
+  return (z[0] * (1 - dc) * (1 - dr) + z[1] * dc * (1 - dr) + z[2] * (1 - dc) * dr + z[3] * dc * dr) / 10;   // decimetres to metres
+}
+
+// Climbing along a route, from heights at the check points (20 m apart), and the steepest 100 m.
+// The grid wobbles by a few tenths of a metre, and adding up every tiny rise made a flat canal path
+// look like 11 m of climbing. So a climb only counts once the route has risen at least 2 m above
+// its lowest point since the last climb (bike apps use the same idea).
+// Returns null when the height grid did not load or part of the route is outside it.
+const CLIMB_THRESHOLD = 2;   // metres
+function routeClimb(points) {
+  if (!routeData.elevation || points.length < 2) return null;
+  const heights = points.map(heightAt);
+  if (heights.includes(null)) return null;
+  let climb = 0;
+  let low = heights[0];
+  heights.forEach(function (h) {
+    if (h < low) {
+      low = h;
+    } else if (h - low >= CLIMB_THRESHOLD) {
+      climb += h - low;
+      low = h;
+    }
+  });
+  const span = 5;   // 5 check points of 20 m = 100 m
+  let steepest = 0;
+  if (heights.length > span) {
+    for (let i = span; i < heights.length; i++) {
+      steepest = Math.max(steepest, Math.abs(heights[i] - heights[i - span]) / (span * CHECK_EVERY) * 100);
+    }
+  } else {
+    steepest = Math.abs(heights[heights.length - 1] - heights[0]) / ((heights.length - 1) * CHECK_EVERY) * 100;
+  }
+  return { climb: climb, steepest: steepest };
+}
+
 function scoreRoute(route) {
   const line = route.geometry.coordinates.map(function (c) { return toMetres(c[0], c[1]); });
   const points = checkPoints(line);
@@ -387,6 +439,7 @@ function scoreRoute(route) {
     poorPavementKm: onPoorPavement * CHECK_EVERY / 1000,
     repairStations: repairStations,
     collisions: collisions,
+    climb: routeClimb(points),   // { climb, steepest } or null
     problems: problems
   };
 }
@@ -435,6 +488,11 @@ function showRoutes(start, end, routes) {
       if (routes.length > 1 && scored && i === mostSeparated) labels.push('most separated');
       let text = 'Route ' + (i + 1) + (labels.length ? ' (' + labels.join(', ') + ')' : '') + ': ' +
         (route.distance / 1000).toFixed(1) + ' km, about ' + Math.max(1, Math.round(route.duration / 60)) + ' min';
+      // Climbing comes right after the time: it is what a new cyclist notices first
+      if (scored && scores[i].climb) {
+        text += ', ↑ ' + Math.round(scores[i].climb.climb) + ' m of climbing (steepest ' +
+          Math.round(scores[i].climb.steepest) + '%)';
+      }
       if (scored) {
         const s = scores[i];
         text += ', ' + Math.round(100 * s.separatedShare) + '% separated from cars, ' +
@@ -830,6 +888,29 @@ function loadGeoJSON(path) {
   });
 }
 
+// The 40 m height grid made in the notebook: a small description (JSON) and the heights themselves
+// (whole decimetres, 2 bytes each, rows from north to south), read as numbers with an Int16Array.
+function loadElevationGrid() {
+  function get(path, read) {
+    return fetch(path).then(function (response) {
+      if (!response.ok) {
+        throw new Error('Could not load ' + path + ': HTTP ' + response.status);
+      }
+      return read(response);
+    });
+  }
+  return Promise.all([
+    get('../data/elevation_grid.json', function (response) { return response.json(); }),
+    get('../data/elevation_grid.bin', function (response) { return response.arrayBuffer(); })
+  ]).then(function ([info, buffer]) {
+    const heights = new Int16Array(buffer);
+    if (heights.length !== info.rows * info.cols) {
+      throw new Error('The elevation grid is not the size its description says');
+    }
+    return { info: info, heights: heights };
+  });
+}
+
 Promise.all([
   loadGeoJSON('../data/bike_lanes_clean_english.geojson'),
   loadGeoJSON('../data/bike_lanes_with_pavement.geojson'),
@@ -842,15 +923,21 @@ Promise.all([
   loadGeoJSON('../data/bike_collisions.geojson').catch(function (err) {
     console.error(err);
     return null;
+  }),
+  // The height grid is optional too: without it, routes are still scored, just without the climb
+  loadElevationGrid().catch(function (err) {
+    console.error(err);
+    return null;
   })
 ])
-  .then(function ([data, pavementData, repairData, collisionData]) {
+  .then(function ([data, pavementData, repairData, collisionData, elevationGrid]) {
     loadingBox.remove();   // the data is here: take the loading message off the map
 
     // Give the route planner my bike lanes, pavement and repair stations for scoring
     routeData.lanes = buildLaneIndex(data.features, pavementData.features);
     routeData.repairStations = repairData ? repairData.features : [];
     // Each collision's point in metres, worked out once so every route can be checked quickly
+    routeData.elevation = elevationGrid;
     routeData.collisions = collisionData ? collisionData.features.map(function (feature) {
       const c = feature.geometry.coordinates;
       return toMetres(c[0], c[1]);
@@ -867,6 +954,15 @@ Promise.all([
       'Voie partagée Bus-Vélo': 'Shared bus-bike lane'
     };
 
+    // Slope in plain words, from the steepest 100 m of a lane (worked out in the notebook from NRCan heights)
+    function slopeLevel(grade) {
+      return grade < 3 ? 'gentle' : grade < 6 ? 'moderate' : grade < 10 ? 'steep' : 'very steep';
+    }
+    function slopeText(p) {
+      if (p.slope_max === null || p.slope_max === undefined) return 'too short to measure';
+      return slopeLevel(p.slope_max) + ' (steepest 100 m: ' + p.slope_max + '%, end to end: ' + p.slope_avg + '%)';
+    }
+
     function addLanePopup(feature, layer) {
       const p = feature.properties;
       const yesNoNames = {
@@ -879,7 +975,8 @@ Promise.all([
         'Comfort: ' + COMFORT[comfortLevel(p.facility_type)].label +
         (p.facility_type === 'Sentier polyvalent' ? ' (shared with people walking)' : '') + '<br>' +
         'Year-round: ' + (yesNoNames[p.year_round] || p.year_round || 'unknown') + '<br>' +
-        'Length: ' + formatLength(p.length_m)
+        'Length: ' + formatLength(p.length_m) + '<br>' +
+        'Slope: ' + slopeText(p)
       );
 
       // Thicken the line on hover, then put it back to its normal width
@@ -997,10 +1094,22 @@ Promise.all([
       }
     });
 
+    // Steep sections: lanes whose steepest 100 m is 6% or more, as a wide see-through red band, like a highlighter.
+    // It sits in its own pane just below the lanes (Leaflet's lanes are at 400) so each lane's own colour shows on top,
+    // and it ignores clicks so clicking still opens the lane's popup with its slope.
+    map.createPane('steepPane').style.zIndex = 390;
+    const steepLayer = L.geoJSON(data, {
+      pane: 'steepPane',
+      interactive: false,
+      filter: function (feature) { return feature.properties.slope_max >= 6; },
+      style: { color: '#d7301f', weight: 12, opacity: 0.45, lineCap: 'round' }
+    });
+
     const overlays = {
       '<span class="layer-swatch separated"></span>Separated from cars': laneLayers.separated,
       '<span class="layer-swatch painted"></span>Painted lanes': laneLayers.painted,
       '<span class="layer-swatch shared"></span>Shared with traffic': laneLayers.shared,
+      '<span class="layer-swatch steep"></span>Steep sections (over 6%)': steepLayer,
       '<span class="layer-swatch pavement"></span>Pavement condition (matched streets)': pavementLayer
     };
     if (repairData) {
