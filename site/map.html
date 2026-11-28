@@ -111,6 +111,10 @@
           <!-- Phones only: the route form folds up behind this button -->
           <button id="route-toggle" class="route-toggle" type="button" aria-expanded="false" aria-controls="route-form">Plan a route</button>
           <form id="route-form">
+            <!-- Phones only, once a route is planned: the panel folds down to this one line; tapping it opens it again -->
+            <button id="route-sheet-handle" class="sheet-handle" type="button" aria-expanded="true">
+              <span class="sheet-summary"></span><span class="sheet-action">Hide ▼</span>
+            </button>
             <strong class="route-title">Plan a bike route:</strong>
             <label for="route-from">From</label>
             <div class="route-row">

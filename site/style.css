@@ -515,8 +515,12 @@ a {
 }
 
 @media (max-width: 800px) {
+  /* The page is exactly the screen's height, and the map (below) fills what the top bar leaves.
+     dvh follows the phone's real visible height as the browser's address bar slides in and out;
+     vh is the fallback for older browsers. */
   .page {
-    height: auto;
+    height: 100vh;
+    height: 100dvh;
   }
 
   /* Compact top bar: title, "←" and "ⓘ Info" on one line */
@@ -570,10 +574,10 @@ a {
     text-align: left;
   }
 
+  /* The map takes all the height left under the top bar (never less than 240 px) */
   #map {
-    flex: none;
-    height: 70vh;
-    min-height: 420px;
+    flex: 1;
+    min-height: 240px;
   }
 
   /* On a phone the route form stacks: each label on its own line, boxes full width */
@@ -606,12 +610,45 @@ a {
     order: 3;
   }
 
+  /* The route form opens as a panel over the bottom of the map ("bottom sheet") instead of pushing the map down */
   .tools.route-open #route-form {
+    display: flex;
+    position: fixed;
+    right: 8px;
+    bottom: 8px;
+    left: 8px;
+    z-index: 1050; /* above the map and its controls */
+    border-radius: 12px;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Long results scroll inside the panel, so it never covers most of the map */
+  #route-form #route-result {
+    max-width: none;
+    max-height: 40vh;
+    max-height: 40dvh;
+    overflow-y: auto;
+  }
+
+  /* Address suggestions open upward, over the map, since the boxes now sit near the bottom of the screen */
+  .suggestions {
+    top: auto;
+    bottom: 100%;
+    margin: 0 0 2px;
+  }
+
+  /* Once a route is planned, the fold line shows; folded, it is all that shows */
+  #route-form.has-results .sheet-handle {
     display: flex;
   }
 
-  #route-form #route-result {
-    max-width: none;
+  #route-form.collapsed > :not(.sheet-handle) {
+    display: none;
+  }
+
+  /* While the panel is open, lift the map's bottom controls (report, locate, zoom, credit) above its folded line */
+  .page:has(.tools.route-open) .leaflet-bottom {
+    bottom: 90px;
   }
 
   #route-form input {
@@ -691,6 +728,30 @@ a {
   background: var(--accent);
   border-color: var(--accent);
   color: white;
+}
+
+/* The phone panel's fold line (shown only on phones once a route is planned; see the phone rules) */
+.sheet-handle {
+  display: none;
+  flex-basis: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: #eef2fa;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sheet-handle .sheet-action {
+  flex: none;
+  color: var(--accent);
 }
 
 /* "Clear route" under the route results, and "⇅ Swap" between From and To */

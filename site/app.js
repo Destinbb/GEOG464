@@ -503,6 +503,14 @@ function showRoutes(start, end, routes) {
   }
 
   function showResult(selected) {
+    // The one-line summary on the phone panel's handle: the route on the map, its length, time and climb
+    const shown = routes[selected];
+    routeSheetHandle.querySelector('.sheet-summary').textContent =
+      'Route ' + (selected + 1) + ': ' + (shown.distance / 1000).toFixed(1) + ' km, about ' +
+      Math.max(1, Math.round(shown.duration / 60)) + ' min' +
+      (scored && scores[selected].climb ? ', ↑ ' + Math.round(scores[selected].climb.climb) + ' m' : '');
+    routeForm.classList.add('has-results');
+
     routeResult.textContent = '';
     const heading = document.createElement('p');
     heading.textContent = 'A: ' + start.name + '. B: ' + end.name + '.';
@@ -537,7 +545,10 @@ function showRoutes(start, end, routes) {
       button.className = 'route-choice';
       button.setAttribute('aria-pressed', String(i === selected));
       button.textContent = text;
-      button.addEventListener('click', function () { draw(i); });
+      button.addEventListener('click', function () {
+        draw(i);
+        if (onPhone()) setSheetCollapsed(true);   // fold the panel so the newly chosen route shows
+      });
       routeResult.append(button);
     });
 
@@ -567,13 +578,22 @@ function showRoutes(start, end, routes) {
     clear.addEventListener('click', function () {
       routeLayer.clearLayers();
       routeResult.textContent = '';
+      resetRouteSheet();
       routeFrom.focus();
     });
     routeResult.append(clear);
   }
 
   draw(scored ? mostSeparated : fastest);
-  map.fitBounds(L.geoJSON(routes.map(function (r) { return r.geometry; })).getBounds().pad(0.1));
+  // Phones: fold the panel and close the keyboard, so the route shows on the map,
+  // then zoom so the routes are not hidden behind the folded panel
+  if (onPhone()) {
+    setSheetCollapsed(true);
+    if (document.activeElement) document.activeElement.blur();
+  }
+  map.fitBounds(L.geoJSON(routes.map(function (r) { return r.geometry; })).getBounds().pad(0.1), {
+    paddingBottomRight: [0, onPhone() ? routeForm.offsetHeight + 16 : 0]
+  });
 }
 
 const routeForm = document.getElementById('route-form');
@@ -581,6 +601,27 @@ const routeFrom = document.getElementById('route-from');
 const routeTo = document.getElementById('route-to');
 const routeResult = document.getElementById('route-result');
 const MY_LOCATION = 'My location';
+
+// ---------- Phones: the route form is a panel over the bottom of the map ("bottom sheet") ----------
+// Once a route is planned, the panel folds down to one line (the handle) so the route shows on the map;
+// tapping the handle opens it again. CSS only does this on phones; on a computer nothing changes.
+const routeSheetHandle = document.getElementById('route-sheet-handle');
+function onPhone() {
+  return window.matchMedia('(max-width: 800px)').matches;
+}
+function setSheetCollapsed(collapsed) {
+  routeForm.classList.toggle('collapsed', collapsed);
+  routeSheetHandle.setAttribute('aria-expanded', String(!collapsed));
+  routeSheetHandle.querySelector('.sheet-action').textContent = collapsed ? 'Show details ▲' : 'Hide ▼';
+}
+// No route any more (Clear route, or a box emptied): back to the plain form
+function resetRouteSheet() {
+  routeForm.classList.remove('has-results');
+  setSheetCollapsed(false);
+}
+routeSheetHandle.addEventListener('click', function () {
+  setSheetCollapsed(!routeForm.classList.contains('collapsed'));
+});
 
 // × buttons in the From and To boxes: show one only when its box has text.
 // Pressing it empties the box and removes the planned route, since the route no longer matches.
@@ -595,6 +636,7 @@ document.querySelectorAll('.clear-button').forEach(function (button) {
     showButton();
     routeLayer.clearLayers();
     routeResult.textContent = '';
+    resetRouteSheet();
     input.focus();
   });
 });
