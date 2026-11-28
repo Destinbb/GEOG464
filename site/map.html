@@ -15,10 +15,14 @@
           <h1>Montreal: Bicycle Network</h1>
 
           <!-- Back to the landing page (index.html) -->
-          <a class="home-link" href="index.html">← Back to home</a>
+          <!-- (on phones only the arrow shows; the words stay for screen readers) -->
+          <a class="home-link" href="index.html">← <span class="home-text">Back to home</span></a>
+
+          <!-- Phones only: the four tabs fold into this button's menu (hidden on a computer by CSS) -->
+          <button id="info-toggle" class="info-toggle" type="button" aria-expanded="false" aria-controls="info-tabs">ⓘ Info</button>
 
           <!-- Small tabs: each opens one block of information; clicking it again closes it -->
-          <nav class="tabs" aria-label="About this map">
+          <nav id="info-tabs" class="tabs" aria-label="About this map">
             <button type="button" class="tab" aria-expanded="false" aria-controls="panel-about">About</button>
             <button type="button" class="tab" aria-expanded="false" aria-controls="panel-how">How to use</button>
             <button type="button" class="tab" aria-expanded="false" aria-controls="panel-data">Data sources</button>
@@ -131,12 +135,6 @@
         </div>
       </header>
 
-      <form id="search-form">
-        <label for="search-input">Find routes separated from cars in a neighbourhood:</label>
-        <input id="search-input" type="search" placeholder="e.g. Verdun, Plateau" />
-        <button type="submit">Search</button>
-        <p id="search-result"></p>
-      </form>
       <div id="map"></div>
     </div>
 

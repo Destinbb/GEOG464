@@ -221,7 +221,7 @@ A review of my map against Nielsen's 10 usability heuristics found that my map's
 | 12 | Enter in the To box plans the route | Flexibility and efficiency | Done already (the route boxes are a form) | – |
 | 13 | Collision data: how many collisions lie along each route | New data | Planned | 4 |
 | 14 | Slope: how steep each street or route is (%), e.g. near Mont-Royal | New data | Planned | 5 |
-| 15 | Phone layout needs serious work: the controls crowd the map on a small screen | Aesthetic and minimalist design | Planned | later |
+| 15 | Phone layout needs serious work: the controls crowd the map on a small screen | Aesthetic and minimalist design | Planned | 6 |
 
 ## Phase 0: landing page
 The site now opens on a landing page (`site/index.html`) that says who the map is for, what it can do and how to read it, with buttons to the map. The map itself moved to `site/map.html`.
@@ -347,3 +347,19 @@ Adds how steep each bike lane is, a "Steep sections" layer, and the climb on eac
 | 5.3b | Edge: plan a flat trip (e.g. Lachine Canal) | About 0 m of climbing, no error. | Marche Atwater to Joe Beef: Passed|
 | 5.3c | Edge: block `elevation_grid.bin` and plan a route | Route still shows, without the climb, no error. | Passed|
 | 5.4 | Open Data sources and How to use | NRCan is credited; bridges note shown. | |
+
+## Phase 6: phone layout
+Made the map usable on a phone (it was pushed off the screen) and removed the neighbourhood search, since testers preferred address search (Part 3).
+
+![Before: the map on a phone](images/phase6-before-phone.png)
+
+### Tests (written before the code)
+| # | What I do | Expected | Result |
+| --- | --- | --- | --- |
+| 6.1 | Open the map on a computer and on a phone | No neighbourhood search box; no console errors; "Year-round routes only" still works. | |
+| 6.2 | Phone: look at the top of the map page, press "ⓘ Info" | Title and "← Home" on one line; Info opens a menu with About, How to use, Data sources and How AI was used. A computer still shows the four tabs. | |
+| 6.3 | Phone: open the map | The map fills the screen under the top bar; no scrolling needed to see the zoom and report buttons. | |
+| 6.4 | Phone: press "Plan a route", plan a trip | The form opens over the map; after planning, it shrinks to a short summary and the route is visible; tapping the summary opens it again. | |
+| 6.5 | Plan Oratoire Saint-Joseph → Marché Jean-Talon (phone and computer) | Each route is one short line (distance, time, climb, % separated); "Details" shows the rest. | |
+| 6.6 | Phone: look at the bottom of the map | "Report or suggest" is just its icon (still named for screen readers); the map credit is one line. | |
+| 6.7 | Phone: open the landing page | One column, readable, no sideways scrolling. | |

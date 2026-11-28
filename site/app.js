@@ -48,10 +48,36 @@ tabs.forEach(function (tab) {
   });
 });
 
+// Phones: the four tabs fold into one "ⓘ Info" button that opens them as a small menu.
+// (On a computer, CSS hides the button and shows the tabs as before.)
+const infoToggle = document.getElementById('info-toggle');
+const titleRow = infoToggle.closest('.title-row');
+function setInfoMenu(open) {
+  titleRow.classList.toggle('info-open', open);
+  infoToggle.setAttribute('aria-expanded', String(open));
+}
+infoToggle.addEventListener('click', function () {
+  setInfoMenu(!titleRow.classList.contains('info-open'));
+});
+// Choosing a topic closes the menu; its block of text opens below as before
+tabs.forEach(function (tab) {
+  tab.addEventListener('click', function () { setInfoMenu(false); });
+});
+// A tap anywhere outside the title row closes it too
+document.addEventListener('click', function (event) {
+  if (!titleRow.contains(event.target)) setInfoMenu(false);
+});
+
 // Esc closes the open tab and puts the keyboard focus back on its button.
 // An Esc already used elsewhere (e.g. to close a suggestion list) is left alone.
 document.addEventListener('keydown', function (event) {
   if (event.key !== 'Escape' || event.defaultPrevented) return;
+  // Phones: an open Info menu closes first, with the focus back on its button
+  if (titleRow.classList.contains('info-open')) {
+    setInfoMenu(false);
+    infoToggle.focus();
+    return;
+  }
   const open = document.querySelector('.tab[aria-expanded="true"]');
   if (open) {
     open.click();   // clicking the open tab closes it
@@ -65,7 +91,7 @@ const ISLAND = { west: -73.98, south: 45.40, east: -73.47, north: 45.71 };
 
 // ---------- Comfort levels: how a lane is built, not the city's "protected" flag ----------
 // The city's PROTEGE_4S field really means "protected and kept open all winter", so lanes are grouped
-// by facility_type instead. Every part of the map (layers, search, route scores) asks comfortLevel().
+// by facility_type instead. Every part of the map (layers, route scores) asks comfortLevel().
 const COMFORT = {
   separated: { label: 'Separated from cars', color: '#2166ac', weight: 5, dashArray: null },
   painted: { label: 'Painted lane', color: '#6baed6', weight: 3, dashArray: null },
@@ -1137,10 +1163,6 @@ Promise.all([
         layer.addData(data);
       });
       showStatus();
-      // An open neighbourhood search follows the checkbox too
-      if (document.getElementById('search-input').value.trim() !== '') {
-        document.getElementById('search-form').requestSubmit();
-      }
     });
 
     // On phones the legend goes bottom-left so it doesn't stack on top of the zoom buttons
@@ -1198,13 +1220,6 @@ Promise.all([
     }
     showStatus();
 
-    // Search: lower-case, drop accents and apostrophes, and treat hyphens, dashes and spaces the same,
-    // so "montreal nord", "montreal-nord" and "Montréal–Nord" all match
-    function normalise(text) {
-      return (text || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/['’]/g, '')
-        .replace(/[-–—\s]+/g, ' ').toLowerCase().trim();
-    }
-
     // "Show pavement": a button under Reset view that turns the pavement layer on and off.
     // Adding or removing the layer from code also makes the layer box fire overlayadd / overlayremove,
     // so the layer box checkbox, the pavement legend and this button always agree.
@@ -1234,84 +1249,6 @@ Promise.all([
       if (event.layer === pavementLayer) showPavementButton();
     });
 
-    // Move the search form from the page onto the map, in the top-left corner.
-    // On phones there's no room on the map, so put it just above the map instead.
-    if (isPhone) {
-      const mapElement = document.getElementById('map');
-      mapElement.parentNode.insertBefore(document.getElementById('search-form'), mapElement);
-    } else {
-      const searchControl = L.control({ position: 'topleft' });
-      searchControl.onAdd = function () {
-        const form = document.getElementById('search-form');
-        L.DomEvent.disableClickPropagation(form);
-        L.DomEvent.disableScrollPropagation(form);
-        return form;
-      };
-      searchControl.addTo(map);
-    }
-
-    const searchResult = document.getElementById('search-result');
-
-    document.getElementById('search-form').addEventListener('submit', function (event) {
-      event.preventDefault();
-      const typed = document.getElementById('search-input').value;
-      const query = normalise(typed);
-      const matches = laneLayers.separated.getLayers().filter(function (layer) {
-        return query && normalise(layer.feature.properties.area).includes(query);
-      });
-
-      if (query === '') {
-        searchResult.textContent = 'Type a neighbourhood name, e.g. Verdun.';
-        return;
-      }
-
-      // A partial name like "la" can match several boroughs: list them instead of a mixed count
-      const areas = [...new Set(matches.map(function (layer) {
-        return layer.feature.properties.area;
-      }))];
-      if (areas.length > 1) {
-        searchResult.textContent = '"' + typed + '" matches ' + areas.length +
-          ' neighbourhoods: ' + areas.join(', ') + '. Type more of the name.';
-        return;
-      }
-
-      if (matches.length === 0) {
-        searchResult.textContent = 'No routes separated from cars' + (yearRoundOnly ? ' and open year-round' : '') +
-          ' found for "' + typed + '".';
-        return;
-      }
-      if (!map.hasLayer(laneLayers.separated)) {
-        laneLayers.separated.addTo(map);
-      }
-      map.fitBounds(L.featureGroup(matches).getBounds().pad(0.05));
-
-      // Pavement summary: of this neighbourhood's separated segments that have a survey record,
-      // how many are in good or excellent condition. Segments with no record are left out, not counted as bad.
-      const area = matches[0].feature.properties.area;
-      const surveyed = pavementData.features.filter(function (feature) {
-        return showsLane(feature, 'separated') && feature.properties.area === area;
-      });
-      const good = surveyed.filter(function (feature) {
-        const condition = feature.properties.pavement_condition;
-        return condition === 'Excellent' || condition === 'Bon';
-      }).length;
-
-      let summary = matches.length + ' segments separated from cars' + (yearRoundOnly ? ' and open year-round' : '') +
-        ' in ' + area + '. ';
-      if (surveyed.length === 0) {
-        summary += 'None have a pavement survey record.';
-      } else {
-        summary += surveyed.length + ' have a pavement survey record; ' + good + ' of those (' +
-          Math.round(100 * good / surveyed.length) + '%) are in good or excellent condition.';
-      }
-      searchResult.textContent = summary;
-    });
-    document.getElementById('search-input').addEventListener('input', function (event) {
-      if (event.target.value === '') {
-        map.setView([45.51, -73.57], 11);
-        searchResult.textContent = '';
-      }
-    });
   })
   .catch(function (err) {
     loadingBox.remove();   // loading failed: the error message below takes its place
@@ -1330,8 +1267,5 @@ Promise.all([
       return div;
     };
     errorBox.addTo(map);
-
-    // The search cannot work without the data, so hide it
-    document.getElementById('search-form').hidden = true;
     console.error(err);
   });

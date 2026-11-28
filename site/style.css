@@ -78,6 +78,25 @@ body {
   outline-offset: 2px;
 }
 
+/* "ⓘ Info": phones only (shown in the phone rules below); styled like the tabs it replaces */
+.info-toggle {
+  display: none;
+  padding: 4px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: white;
+  color: var(--accent);
+  font: inherit;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.info-toggle[aria-expanded="true"] {
+  background: var(--accent);
+  color: white;
+}
+
 /* "← Back to home": back to the landing page, styled like the tabs but filled so it reads as a link */
 .home-link {
   padding: 4px 12px;
@@ -254,18 +273,12 @@ a {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
 }
 
-#search-form,
 #route-form {
   padding: 8px 10px;
   background: white;
   border-radius: 4px;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
   font-size: 14px;
-}
-
-#search-form label {
-  display: block;
-  margin-bottom: 4px;
 }
 
 /* Route form laid out in one row: Plan a bike route: From [ ] To [ ] [Plan route] */
@@ -506,6 +519,57 @@ a {
     height: auto;
   }
 
+  /* Compact top bar: title, "←" and "ⓘ Info" on one line */
+  .title-row {
+    position: relative;
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .title-row h1 {
+    flex: 1;
+    font-size: 18px;
+  }
+
+  /* "Back to home" stays for screen readers; only the arrow shows */
+  .home-link .home-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .info-toggle {
+    display: block;
+  }
+
+  /* The tabs become a small menu under the top bar, shown while Info is open */
+  .tabs {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 1100; /* above the map */
+    flex-direction: column;
+    align-items: stretch;
+    min-width: 200px;
+    margin-top: 6px;
+    padding: 8px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  }
+
+  .title-row.info-open .tabs {
+    display: flex;
+  }
+
+  .tabs .tab {
+    text-align: left;
+  }
+
   #map {
     flex: none;
     height: 70vh;
@@ -546,12 +610,10 @@ a {
     display: flex;
   }
 
-  #search-form #search-result,
   #route-form #route-result {
     max-width: none;
   }
 
-  #search-input,
   #route-form input {
     font-size: 16px; /* stops iPhone Safari zooming in when the box is tapped */
   }
@@ -584,7 +646,6 @@ a {
   display: block;
 }
 
-#search-result,
 #route-result {
   margin: 6px 0 0;
   max-width: 220px;
