@@ -597,6 +597,27 @@ a {
   cursor: pointer;
 }
 
+/* "Show pavement" under Reset view, matching that button's look; filled dark blue while the layer is on */
+.pavement-toggle {
+  padding: 6px 10px;
+  border: 2px solid rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  background: white;
+  color: var(--text);
+  font: 14px Arial, sans-serif;
+  cursor: pointer;
+}
+
+.pavement-toggle:hover {
+  background: #f1f5f9;
+}
+
+.pavement-toggle[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
 /* "Clear route" under the route results, and "⇅ Swap" between From and To */
 .route-clear {
   margin-top: 8px;

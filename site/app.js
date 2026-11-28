@@ -1021,6 +1021,35 @@ Promise.all([
         .replace(/[-–—\s]+/g, ' ').toLowerCase().trim();
     }
 
+    // "Show pavement": a button under Reset view that turns the pavement layer on and off.
+    // Adding or removing the layer from code also makes the layer box fire overlayadd / overlayremove,
+    // so the layer box checkbox, the pavement legend and this button always agree.
+    const PavementButton = L.Control.extend({
+      onAdd: function () {
+        const button = L.DomUtil.create('button', 'pavement-toggle');
+        button.type = 'button';
+        L.DomEvent.disableClickPropagation(button);
+        button.addEventListener('click', function () {
+          if (map.hasLayer(pavementLayer)) {
+            map.removeLayer(pavementLayer);
+          } else {
+            pavementLayer.addTo(map);
+          }
+        });
+        return button;
+      }
+    });
+    const pavementButton = new PavementButton({ position: 'topleft' }).addTo(map).getContainer();
+    function showPavementButton() {
+      const on = map.hasLayer(pavementLayer);
+      pavementButton.textContent = on ? 'Hide pavement' : 'Show pavement';
+      pavementButton.setAttribute('aria-pressed', String(on));   // tells screen readers whether it is on
+    }
+    showPavementButton();
+    map.on('overlayadd overlayremove', function (event) {
+      if (event.layer === pavementLayer) showPavementButton();
+    });
+
     // Move the search form from the page onto the map, in the top-left corner.
     // On phones there's no room on the map, so put it just above the map instead.
     if (isPhone) {

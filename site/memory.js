@@ -77,11 +77,18 @@ function addMemory(map) {
     onAdd() {
       const box = L.DomUtil.create("div", "memory-panel");
       box.style.cssText = "background:#fff;padding:8px 10px;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.35);font:14px Arial,sans-serif;max-width:230px";
+      // Folded at the start: one "Report or suggest" button and the status line (always visible, so messages
+      // and errors are never hidden). Pressing the button opens the rest: Add a point, the key and Download.
       box.innerHTML =
-        '<button type="button" data-m="add" style="width:100%;min-height:40px;font-weight:bold;cursor:pointer">Add a point</button>' +
-        '<div data-m="status" role="status" style="margin:6px 0">Loading...</div>' +
-        '<ul data-m="legend" style="list-style:none;margin:0 0 6px;padding:0"></ul>' +
-        '<button type="button" data-m="export" style="width:100%;cursor:pointer">Download points (GeoJSON)</button>';
+        '<button type="button" data-m="toggle" aria-expanded="false" aria-controls="memory-panel-body" ' +
+          'style="width:100%;min-height:40px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">' +
+          memoryIcon(Object.values(MEMORY.categories)[0], 16) + 'Report or suggest</button>' +
+        '<div data-m="status" role="status" style="margin:6px 0 0">Loading...</div>' +
+        '<div id="memory-panel-body" data-m="body" hidden style="margin-top:8px">' +
+          '<button type="button" data-m="add" style="width:100%;min-height:40px;font-weight:bold;cursor:pointer">Add a point</button>' +
+          '<ul data-m="legend" style="list-style:none;margin:6px 0;padding:0"></ul>' +
+          '<button type="button" data-m="export" style="width:100%;cursor:pointer">Download points (GeoJSON)</button>' +
+        '</div>';
       L.DomEvent.disableClickPropagation(box);
       return box;
     }
@@ -97,6 +104,13 @@ function addMemory(map) {
     $("legend").append(li);
   }
   function status(text) { $("status").textContent = text; }
+
+  // "Report or suggest" opens and closes the rest of the panel
+  $("toggle").addEventListener("click", () => {
+    const opening = $("body").hidden;
+    $("body").hidden = !opening;
+    $("toggle").setAttribute("aria-expanded", String(opening));   // tells screen readers whether it is open
+  });
 
   function draw() {
     layer.clearLayers();
