@@ -12,6 +12,13 @@ map.attributionControl.addAttribution(
 
 const isPhone = window.innerWidth <= 800;
 
+// ---------- Loading message ----------
+// A box with a spinner in the middle of the map until the bike lanes arrive.
+// The data-loading code further down removes it, whether the data loads or fails.
+const loadingBox = L.DomUtil.create('div', 'map-loading', map.getContainer());
+loadingBox.setAttribute('role', 'status');
+loadingBox.innerHTML = '<span class="spinner" aria-hidden="true"></span>Loading bike lanes…';
+
 // ---------- Information tabs ----------
 // Each tab opens its block of text; clicking the open tab again closes it. Only one is open at a time.
 const tabs = document.querySelectorAll('.tab');
@@ -710,9 +717,6 @@ routeForm.addEventListener('submit', function (event) {
     });
 });
 
-const colours = {
-  Repair: '#1b7837'
-};
 const pavementColours = {
   'Excellent': '#ffffd4',
   'Bon': '#fed98e',
@@ -731,6 +735,19 @@ const pavementConditionNames = {
 function colourForPavement(condition) {
   return pavementColours[condition] || '#888888';
 }
+
+// Lengths in plain words: "326 m" under 1 km, "2.4 km" from 1 km up
+function formatLength(metres) {
+  if (!metres) return 'not recorded';
+  return metres < 1000 ? Math.round(metres) + ' m' : (metres / 1000).toFixed(1) + ' km';
+}
+
+// A white wrench (the "tool" icon from Feather Icons, MIT licence), for repair stations and their legend
+const WRENCH_SVG =
+  '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false" fill="none" ' +
+  'stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+  '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91' +
+  'a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>';
 function loadGeoJSON(path) {
   return fetch(path).then(function (response) {
     if (!response.ok) {
@@ -750,6 +767,8 @@ Promise.all([
   })
 ])
   .then(function ([data, pavementData, repairData]) {
+    loadingBox.remove();   // the data is here: take the loading message off the map
+
     // Give the route planner my bike lanes, pavement and repair stations for scoring
     routeData.lanes = buildLaneIndex(data.features, pavementData.features);
     routeData.repairStations = repairData ? repairData.features : [];
@@ -777,7 +796,7 @@ Promise.all([
         'Comfort: ' + COMFORT[comfortLevel(p.facility_type)].label +
         (p.facility_type === 'Sentier polyvalent' ? ' (shared with people walking)' : '') + '<br>' +
         'Year-round: ' + (yesNoNames[p.year_round] || p.year_round || 'unknown') + '<br>' +
-        'Length: ' + (p.length_m || 0) + ' m'
+        'Length: ' + formatLength(p.length_m)
       );
 
       // Thicken the line on hover, then put it back to its normal width
@@ -822,8 +841,8 @@ Promise.all([
         const p = feature.properties;
         layer.bindPopup(
           '<strong>Street pavement condition: ' + (pavementConditionNames[p.pavement_condition] || p.pavement_condition || 'not recorded') + '</strong><br>' +
-          'PCI score: ' + (p.pavement_pci ?? 'not recorded') + '<br>' +
-          'Survey date: ' + (p.survey_date || 'not recorded')
+          'Pavement score: ' + (p.pavement_pci != null ? Math.round(p.pavement_pci) + ' out of 100 (higher is better)' : 'not recorded') + '<br>' +
+          'Surveyed: ' + (p.survey_date || 'not recorded')
         );
       }
     });
@@ -836,13 +855,11 @@ Promise.all([
     // Most stations have no name in OpenStreetMap, so number them for the popup and the saved list
     let stationNumber = 0;
     const repairLayer = L.geoJSON(repairData, {
+      // Each station is a white wrench on a green circle (an HTML icon), so it reads as "repair" without the legend
       pointToLayer: function (feature, latlng) {
-        return L.circleMarker(latlng, {
-          radius: 6,
-          color: '#ffffff',
-          weight: 2,
-          fillColor: colours.Repair,
-          fillOpacity: 1
+        return L.marker(latlng, {
+          icon: L.divIcon({ className: 'repair-icon', html: WRENCH_SVG, iconSize: [24, 24] }),
+          title: 'Bike repair station'
         });
       },
       onEachFeature: function (feature, layer) {
@@ -871,7 +888,7 @@ Promise.all([
       '<span class="layer-swatch pavement"></span>Pavement condition (matched streets)': pavementLayer
     };
     if (repairData) {
-      overlays['<span class="layer-swatch repair"></span>Bike repair stations'] = repairLayer;
+      overlays['<span class="layer-swatch repair">' + WRENCH_SVG + '</span>Bike repair stations'] = repairLayer;
     }
     // Collapse the layer list into an icon on phones so it doesn't cover the map
     const layerControl = L.control.layers(null, overlays, { collapsed: isPhone }).addTo(map);
@@ -912,7 +929,7 @@ Promise.all([
 
       div.innerHTML =
         '<strong>Pavement condition</strong>' +
-        '<span class="legend-note"><br>Colours show pavement condition categories; click on a segment to see its PCI score.</span>' +
+        '<span class="legend-note"><br>Colours show pavement condition categories; click on a segment to see its pavement score out of 100.</span>' +
         conditions.map(function ([value, label]) {
           return '<span class="legend-item"><i style="background:' + colourForPavement(value) + '"></i>' + label + '</span>';
         }).join('');
@@ -1040,6 +1057,7 @@ Promise.all([
     });
   })
   .catch(function (err) {
+    loadingBox.remove();   // loading failed: the error message below takes its place
     const message = 'The bike-lane data could not be loaded. Check your internet connection and reload the page.';
     const status = document.getElementById('status');
     if (status) {

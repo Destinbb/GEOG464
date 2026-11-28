@@ -201,11 +201,31 @@ a {
   cursor: pointer;
 }
 
+/* Repair stations: a white wrench on a green circle, on the map and as the layer box swatch */
+.repair-icon,
 .layer-swatch.repair {
-  width: 10px;
-  height: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 50%;
   background: #1b7837;
+  color: white;
+}
+
+.repair-icon {
+  border: 2px solid white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.layer-swatch.repair {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+.layer-swatch.repair svg {
+  width: 10px;
+  height: 10px;
 }
 
 .layer-swatch.pavement {
@@ -410,6 +430,47 @@ a {
   font-size: 13px;
   font-weight: 700;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* "Loading bike lanes…" box in the middle of the map, shown until the data arrives */
+.map-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1000; /* above the map tiles and lines */
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  font-size: 15px;
+  pointer-events: none; /* never blocks clicks on the map */
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid #d1d5db;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* People who ask their device for less motion get the message without the spinning */
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
 }
 
 .map-error {

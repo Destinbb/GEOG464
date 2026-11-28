@@ -269,12 +269,13 @@ Four small changes from the heuristic review (items 5 to 8):
 ### Tests (written before the code)
 | # | What I do | Expected | Result |
 | --- | --- | --- | --- |
-| 2.1a | DevTools, Network, "Slow 3G", reload the map | A box with a spinner and "Loading bike lanes…" shows on the map until the lanes appear, then disappears. | |
+| 2.1a | DevTools, Network, "Slow 3G", reload the map | A box with a spinner and "Loading bike lanes…" shows on the map until the lanes appear, then disappears. |Passed, also displays spinner with no throttling option when refreshing page |
 | 2.1b | Block `bike_lanes_clean_english.geojson` in DevTools and reload | The loading box disappears and the error message "The bike-lane data could not be loaded…" shows instead. | |
-| 2.2a | Click a lane over 1 km long (e.g. a long multi-use trail) and a short one | The long one shows its length in km (e.g. "2.4 km"); the short one in m (e.g. "326 m"). | |
-| 2.2b | Turn on Pavement condition and click a segment | "Pavement score: [number] out of 100 (higher is better)" and "Surveyed: [date]"; no "PCI" or "ID_TRC" in the popups or the How to use tab. | |
+| 2.2a | Click a lane over 1 km long (e.g. a long multi-use trail) and a short one | The long one shows its length in km (e.g. "2.4 km"); the short one in m (e.g. "326 m"). |Passed |
+| 2.2b | Turn on Pavement condition and click a segment | "Pavement score: [42] out of 100 (higher is better)" and "Surveyed: [2024-10-03]"; no "PCI" or "ID_TRC" in the popups or the How to use tab. | Passed|
 | 2.3a | Plan a route, then press "Clear route" | The lines, pins and results disappear; the From and To addresses stay. | |
 | 2.3b | Open the "How to use" tab, then press Esc | The tab closes and the keyboard focus is back on its button. With a suggestion list open, Esc closes only the list. | |
 | 2.3c | Type a From and a To, press "⇅ Swap", then Plan route | From and To change places, and the route is planned in the other direction. | |
 | 2.4a | Add one point of each type | An orange triangle "!", a red square "✕" and a purple circle with a lightbulb; none looks like a lane colour. The panel key shows the same shapes. | |
 | 2.4b | Open each new point's popup | Its category and note show, and "Delete my point" still works. | |
+| 2.5 | Turn on "Bike repair stations", click one, save it to My repair stations, then click it in that list | Each station is a white wrench on a green circle; the popup opens as before; the saved station zooms and opens from the list. The layer box swatch and the landing page legend show a wrench too. | |
