@@ -38,6 +38,17 @@ tabs.forEach(function (tab) {
   });
 });
 
+// Esc closes the open tab and puts the keyboard focus back on its button.
+// An Esc already used elsewhere (e.g. to close a suggestion list) is left alone.
+document.addEventListener('keydown', function (event) {
+  if (event.key !== 'Escape' || event.defaultPrevented) return;
+  const open = document.querySelector('.tab[aria-expanded="true"]');
+  if (open) {
+    open.click();   // clicking the open tab closes it
+    open.focus();
+  }
+});
+
 // ---------- Locate me ----------
 // A rough box around the island of Montreal, used to keep address results on the island
 const ISLAND = { west: -73.98, south: 45.40, east: -73.47, north: 45.71 };
@@ -434,6 +445,18 @@ function showRoutes(start, end, routes) {
     caveat.textContent = (routes.length === 1 ? 'The router found only one route for this trip. ' : '') +
       'The router suggests the routes; my map scores them. Pavement is only known where a bike lane matched the city survey.';
     routeResult.append(caveat);
+
+    // Clear route: removes the lines, pins and results, but keeps the addresses so the reader can change one
+    const clear = document.createElement('button');
+    clear.type = 'button';
+    clear.className = 'route-clear';
+    clear.textContent = 'Clear route';
+    clear.addEventListener('click', function () {
+      routeLayer.clearLayers();
+      routeResult.textContent = '';
+      routeFrom.focus();
+    });
+    routeResult.append(clear);
   }
 
   draw(scored ? mostSeparated : fastest);
@@ -670,6 +693,20 @@ function addSuggestions(input, offerMyLocation) {
 addSuggestions(routeFrom, true);
 addSuggestions(routeTo, false);
 
+// ⇅ Swap: From and To change places, together with the suggestions picked in them,
+// so nothing has to be looked up again. The reader then presses Plan route as usual.
+document.getElementById('route-swap').addEventListener('click', function () {
+  const fromText = routeFrom.value;
+  routeFrom.value = routeTo.value;
+  routeTo.value = fromText;
+  const fromChosen = chosenPlaces[routeFrom.id];
+  chosenPlaces[routeFrom.id] = chosenPlaces[routeTo.id];
+  chosenPlaces[routeTo.id] = fromChosen;
+  // Setting the text from code fires no input event, so send one to show or hide each × button
+  routeFrom.dispatchEvent(new Event('input'));
+  routeTo.dispatchEvent(new Event('input'));
+});
+
 routeForm.addEventListener('submit', function (event) {
   event.preventDefault();
   const fromText = routeFrom.value.trim();
@@ -683,22 +720,29 @@ routeForm.addEventListener('submit', function (event) {
   submitButton.disabled = true;
   routeResult.textContent = 'Planning your route…';
 
-  // A place picked from the suggestions already has its point; otherwise look the text up
-  const usingMyLocation = fromText.toLowerCase() === MY_LOCATION.toLowerCase();
-  const startChosen = chosenPlace(routeFrom);
-  const endChosen = chosenPlace(routeTo);
-  const startPlace = usingMyLocation
-    ? (myLocation ? Promise.resolve(myLocation) : locateMe()).then(function (latlng) {
-      return { latlng: latlng, name: 'your location' };
-    })
-    : startChosen ? Promise.resolve(startChosen) : findPlace(fromText);
+  // Each end is "My location" (it can be in either box after a Swap), a picked suggestion
+  // (which already has its point), or text that still has to be looked up with Nominatim
+  function isMyLocation(text) {
+    return text.toLowerCase() === MY_LOCATION.toLowerCase();
+  }
+  function needsLookup(input, text) {
+    return !isMyLocation(text) && !chosenPlace(input);
+  }
+  function placeFor(input, text) {
+    if (isMyLocation(text)) {
+      return (myLocation ? Promise.resolve(myLocation) : locateMe()).then(function (latlng) {
+        return { latlng: latlng, name: 'your location' };
+      });
+    }
+    return chosenPlace(input) ? Promise.resolve(chosenPlace(input)) : findPlace(text);
+  }
 
   // Nominatim asks for no more than one request per second: wait only if both ends are looked up there
-  const wait = !usingMyLocation && !startChosen && !endChosen ? 1000 : 0;
-  startPlace
+  const wait = needsLookup(routeFrom, fromText) && needsLookup(routeTo, toText) ? 1000 : 0;
+  placeFor(routeFrom, fromText)
     .then(function (start) {
       return new Promise(function (resolve) { setTimeout(resolve, wait); })
-        .then(function () { return endChosen || findPlace(toText); })
+        .then(function () { return placeFor(routeTo, toText); })
         .then(function (end) { return [start, end]; });
     })
     .then(function ([start, end]) {

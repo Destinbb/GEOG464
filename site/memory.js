@@ -19,10 +19,12 @@
 // ===== CHANGE THIS PART =====
 const MEMORY = {
   // What a reader can add. Colour plus words, never colour alone.
+  // Each kind also has its own shape and symbol (triangle "!", square "✕", circle with a lightbulb),
+  // and colours the bike lanes do not use, so a report never looks like a lane.
   categories: {
-    observation:    { label: "Report route variability, construction issues",       colour: "#1f77b4" },
-    problem: { label: "Something is wrong",    colour: "#b80000" },
-    idea:    { label: "Input ideas or suggestions",    colour: "#1b1b9e" }
+    observation:    { label: "Report route variability, construction issues",       colour: "#e66101", shape: "triangle" },
+    problem: { label: "Something is wrong",    colour: "#b80000", shape: "square" },
+    idea:    { label: "Input ideas or suggestions",    colour: "#7b3294", shape: "circle" }
   },
   maxNote: 80,                       // characters
   // Where points may go: south, north, west, east. null means anywhere.
@@ -41,6 +43,24 @@ const MEMORY = {
 // ===== END OF THE PART TO CHANGE =====
 
 const MEMORY_SDK = "https://www.gstatic.com/firebasejs/12.18.0/";   // pinned version
+
+// The drawing for one kind of point, at a given size in pixels: its shape and white symbol in its colour.
+// Used for the points on the map and for the key in the panel, so the two always match.
+function memoryIcon(c, size) {
+  const shapes = {
+    triangle: '<path d="M12 2 L23 21 H1 Z" fill="' + c.colour + '" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>' +
+      '<path d="M12 9v5" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.3" fill="#fff"/>',
+    square: '<rect x="2" y="2" width="20" height="20" rx="3" fill="' + c.colour + '" stroke="#fff" stroke-width="1.5"/>' +
+      '<path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>',
+    circle: '<circle cx="12" cy="12" r="10.5" fill="' + c.colour + '" stroke="#fff" stroke-width="1.5"/>' +
+      '<path d="M10 17.5h4M10.5 19.5h3M12 5.5a4.5 4.5 0 0 0-2.8 8c.5.5.8 1.1.8 1.8v.7h4v-.7c0-.7.3-1.3.8-1.8a4.5 4.5 0 0 0-2.8-8z" ' +
+      'fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>'
+  };
+  // A kind with no shape (or a point whose kind is unknown) is a plain circle
+  const shape = shapes[c.shape] || '<circle cx="12" cy="12" r="10" fill="' + c.colour + '" stroke="#fff" stroke-width="1.5"/>';
+  return '<svg viewBox="0 0 24 24" width="' + size + '" height="' + size + '" aria-hidden="true" focusable="false" ' +
+    'style="display:block;overflow:visible;filter:drop-shadow(0 1px 1.5px rgba(0,0,0,.5))">' + shape + '</svg>';
+}
 
 function addMemory(map) {
   const shared = !String(MEMORY.firebaseConfig.apiKey).startsWith("PASTE");
@@ -71,7 +91,8 @@ function addMemory(map) {
   for (const c of Object.values(MEMORY.categories)) {
     const li = document.createElement("li");
     const sw = document.createElement("span");
-    sw.style.cssText = "display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;background:" + c.colour;
+    sw.style.cssText = "display:inline-block;vertical-align:middle;margin-right:6px";
+    sw.innerHTML = memoryIcon(c, 14);   // the same shape as on the map (only the author's settings go in here)
     li.append(sw, document.createTextNode(c.label));
     $("legend").append(li);
   }
@@ -80,9 +101,12 @@ function addMemory(map) {
   function draw() {
     layer.clearLayers();
     for (const p of points) {
-      const c = MEMORY.categories[p.cat] || { colour: "#666" };
-      L.circleMarker([p.lat, p.lng], { radius: 9, color: "#fff", weight: 2, fillColor: c.colour, fillOpacity: 0.9 })
-        .bindPopup(() => popup(p)).addTo(layer);
+      const c = MEMORY.categories[p.cat] || { colour: "#666", label: "" };
+      // A small HTML icon in the shape of its kind (it can also be reached with the Tab key)
+      L.marker([p.lat, p.lng], {
+        icon: L.divIcon({ className: "memory-icon", html: memoryIcon(c, 22), iconSize: [22, 22] }),
+        title: c.label
+      }).bindPopup(() => popup(p)).addTo(layer);
     }
     status((shared ? "Shared: " : "Saved in this browser: ") + points.length + " point" + (points.length === 1 ? "" : "s"));
   }

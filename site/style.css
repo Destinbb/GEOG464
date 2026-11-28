@@ -603,6 +603,17 @@ a {
   cursor: pointer;
 }
 
+/* "Clear route" under the route results, and "⇅ Swap" between From and To */
+.route-clear {
+  margin-top: 8px;
+  cursor: pointer;
+}
+
+.swap-button {
+  white-space: nowrap;
+  cursor: pointer;
+}
+
 .route-choice[aria-pressed="true"] {
   font-weight: bold;
   border: 2px solid #111827;
