@@ -532,9 +532,7 @@ a {
     display: flex;
   }
 
-  #search-form .map-hint,
   #search-form #search-result,
-  #route-form .map-hint,
   #route-form #route-result {
     max-width: none;
   }
@@ -588,10 +586,6 @@ a {
 
 #route-result:empty {
   display: none;
-}
-.map-hint {
-  margin: 0 0 8px;
-  max-width: 220px;
 }
 /* One button per suggested route; the chosen one is bold with a dark border */
 .route-choice {

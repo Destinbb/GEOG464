@@ -279,3 +279,21 @@ Four small changes from the heuristic review (items 5 to 8):
 | 2.4a | Add one point of each type | An orange triangle "!", a red square "✕" and a purple circle with a lightbulb; none looks like a lane colour. The panel key shows the same shapes. | |
 | 2.4b | Open each new point's popup | Its category and note show, and "Delete my point" still works. | |
 | 2.5 | Turn on "Bike repair stations", click one, save it to My repair stations, then click it in that list | Each station is a white wrench on a green circle; the popup opens as before; the saved station zooms and opens from the list. The layer box swatch and the landing page legend show a wrench too. | |
+
+## Phase 3: less clutter on the map
+Review item 9 (aesthetic and minimalist design): five boxes covered the map (Reset view, a large hint and search box, an empty "My repair stations" box, the layer box and the large "Add a point" panel), on top of a busy grey basemap.
+- **3.1 Hint off the map:** "Click any route for its details. Turn on Pavement condition (top right)…" is removed from the map; the landing page and the How to use tab already say it, and 3.2 replaces the pavement half. The neighbourhood search stays as one line.
+- **3.2 "Show pavement" button:** a small button under Reset view turns the pavement layer on and off ("Show pavement" / "Hide pavement") and stays in step with the layer box.
+- **3.3 "Report or suggest":** the Add a point panel starts folded as one button; pressing it opens the full panel. The status line ("Shared: 3 points", or an error) stays visible next to the button.
+- **3.4 "My repair stations" only once something is saved:** the box is hidden while nothing is saved.
+- **3.5 Lighter basemap:** CARTO Positron instead of greyed-out OpenStreetMap tiles, so the lanes and icons stand out (attribution: © OpenStreetMap contributors © CARTO).
+
+### Tests (written before the code)
+| # | What I do | Expected | Result |
+| --- | --- | --- | --- |
+| 3.1 | Open the map | No "Click any route…" hint on the map; the neighbourhood search is one line with its button. | |
+| 3.2 | Press "Show pavement", then untick "Pavement condition" in the layer box | The pavement layer and its legend appear and the button says "Hide pavement"; after unticking, both are gone and the button says "Show pavement" again. | |
+| 3.3 | Open the map, press "Report or suggest", add a point, press it again | It starts folded with the status visible; it opens to the full panel; adding a point still works; it folds again. With the keyboard, Tab and Enter open and close it. | |
+| 3.4 | Open the map with nothing saved, save a repair station, then remove it | No "My repair stations" box at first; it appears after saving; it disappears again after removing the last station. | |
+| 3.5 | Compare the before and after screenshots | The map is lighter and the lanes stand out more; the attribution shows © CARTO. | |
+| 3.6 | Count the boxes on the map | Before: five boxes. After: Reset view, Show pavement, a one-line search, the layer box and one "Report or suggest" button. | |
