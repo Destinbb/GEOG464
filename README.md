@@ -15,6 +15,9 @@ The pavement layer uses ([Indicateurs de condition des chaussées du réseau rou
 ## Bike repair stations data:
 The repair stations layer uses bicycle repair station points from OpenStreetMap (https://www.openstreetmap.org), © OpenStreetMap contributors, licensed under the Open Database License (ODbL) (https://www.openstreetmap.org/copyright). Downloaded with Overpass Turbo (https://overpass-turbo.eu) using the query `node["amenity"="bicycle_repair_station"]` within the City of Montréal boundary (`admin_level=8`), and exported as GeoJSON to `data/repair_stations.geojson`. Accessed November 2, 2026. The file has 87 stations. I did not edit the data; the map shows each station's air pump, tools, opening hours and operator, and shows "not recorded" when a station has no value (only 27 of 87 list opening hours). OpenStreetMap is mapped by volunteers, so some stations may be missing, moved or out of service.
 
+## Bike collisions data:
+The bike collisions layer uses the "Collisions routières" dataset (https://donnees.montreal.ca/dataset/collisions-routieres), published by the City of Montréal from police collision reports collected by the SAAQ, licensed under Creative Commons Attribution 4.0 International. Downloaded as CSV (82 MB, 218,272 collisions) on November 28, 2026. The portal says it was updated in August 2026, but the newest year in the file is 2021, so the map labels it 2012–2021 and shows 2017–2021. The raw CSV stays out of GitHub in `data/raw/` (see `.gitignore`); the notebook reads it and writes `data/bike_collisions.geojson` (0.81 MB). I kept collisions where a bike was involved (`nb_bicyclette` > 0 or a cyclist victim), from 2017 to 2021, with a good location accuracy rating (`LOC_COTE_PD` 1 or 2): 3,687 collisions (96 dropped for location accuracy). I kept the year, date, severity (translated to English), cyclists killed and injured, and street name, and did not change the locations. These are collision counts, not risk: a street with more collisions may simply have more people cycling on it, and 2020 and 2021 are lower, probably partly because of COVID.
+
 
 ## AFTER Demo
 At my demo I felt like my site description could have been a bit more descriptive into what you can actually do with the website. 
@@ -321,8 +324,8 @@ Review item 9 (aesthetic and minimalist design): five boxes covered the map (Res
 | --- | --- | --- | --- |
 | 4.1a | Run the notebook's collision cells | It reports 3,687 collisions kept (917 / 771 / 709 / 588 / 702 by year), 96 dropped for location accuracy, and the checks pass: every point is a Point inside Montreal, every feature has year, severity and the cyclist counts, and the file is under 5 MB. | |
 | 4.1b | Check `git status` after running the notebook | `data/raw/collisions_routieres.csv` does not appear (ignored); `data/bike_collisions.geojson` does. | |
-| 4.2a | Turn on "Bike collisions (2017–2021)" in the layer box | Small dark grey dots appear; serious and fatal collisions are larger and darker. It is off when the map opens. | |
-| 4.2b | Click a collision | Popup: "Collision involving a bike", the year and date, the severity in English, the number of cyclists killed or injured, and the street (or "street not recorded"). | |
+| 4.2a | Turn on "Bike collisions (2017–2021)" in the layer box | Small dark grey dots appear; serious and fatal collisions are larger and darker. It is off when the map opens. | Passed|
+| 4.2b | Click a collision | Popup: "Collision involving a bike", the year and date, the severity in English, the number of cyclists killed or injured, and the street (or "street not recorded"). |Passed |
 | 4.3a | Plan Oratoire Saint-Joseph → Marché Jean-Talon | Each route button also shows "N bike collisions within 25 m (2017–2021)" and the number per km. | |
-| 4.3b | Edge: plan a route where no collisions are recorded nearby (e.g. a short trip in a park) | "0 bike collisions within 25 m", no error. | |
+| 4.3b | Edge: plan a route where no collisions are recorded nearby (e.g. a short trip in a park) | "0 bike collisions within 25 m", no error. | Passed|
 | 4.4 | Open the Data sources tab and the How to use tab | The collision data is credited (City of Montréal / SAAQ, CC BY 4.0, 2012–2021); the page says collisions are counts, not risk. | |

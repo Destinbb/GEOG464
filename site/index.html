@@ -78,6 +78,7 @@
     .swatch.shared { border-color: var(--shared); border-top-width: 3px; border-top-style: dashed; }
     .swatch.pavement { border-image: linear-gradient(90deg, #fed98e, #fe9929, #d95f0e, #993404) 1; }
     .dot { flex: none; display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin: 0 7px; border-radius: 50%; background: var(--repair); color: white; border: 2px solid white; box-shadow: 0 0 0 1px #9ca3af; }
+    .dot.collision { width: 12px; height: 12px; margin: 0 13px; border-width: 1px; background: #525252; }
 
     .steps { margin: 0; padding-left: 1.3em; }
     .steps li { margin-bottom: 6px; }
@@ -145,6 +146,7 @@
         <li><span class="swatch" aria-hidden="true" style="border-color: transparent"></span><span><strong>Year-round routes only</strong> (checkbox in the layer menu): hides routes that close in winter</span></li>
         <li><span class="swatch pavement" aria-hidden="true"></span><span><strong>Yellow to brown</strong>: pavement condition, from good to very poor (2024 city survey)</span></li>
         <li><span class="dot" aria-hidden="true"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span><strong>Green wrench</strong>: public bike repair station</span></li>
+        <li><span class="dot collision" aria-hidden="true"></span><span><strong>Grey dots</strong>: bike collisions, 2017–2021 (bigger and darker means more serious). These are counts, not risk: a busy bike street can have more collisions without being more dangerous per trip.</span></li>
       </ul>
     </div>
 
@@ -161,7 +163,8 @@
     <h2>Good to know</h2>
     <div class="panel fine">
       <p style="margin-top:0">
-        Bike-route and pavement data come from the City of Montréal open-data portal (CC BY 4.0);
+        Bike-route, pavement and collision data come from the City of Montréal open-data portal (CC BY 4.0;
+        the collision reports are from the SAAQ and cover 2012 to 2021);
         repair stations, address search and routing come from OpenStreetMap. Pavement scores describe the street the lane
         runs on, not always the lane itself. What you type in the route boxes is sent to Photon (suggestions) and
         Nominatim (addresses), and the start and end points to OSRM to plan the route. If you choose

@@ -39,6 +39,7 @@
             <li><span class="layer-swatch painted" aria-hidden="true"></span><strong>Painted lane</strong> (medium solid light blue): your own lane, but only paint between you and cars.</li>
             <li><span class="layer-swatch shared" aria-hidden="true"></span><strong>Shared with traffic</strong> (thin dashed pink): no lane of your own; you ride in the street with cars or buses. Off at the start.</li>
           </ul>
+          <p><span class="layer-swatch collision" aria-hidden="true"></span><strong>Bike collisions (2017–2021):</strong> turn them on in the layer menu; bigger, darker dots were more serious. Each planned route also counts the bike collisions within 25 m of it. These are counts, not risk: a street with more collisions may simply have more people cycling on it, so it is not necessarily more dangerous per trip.</p>
         </section>
 
         <section id="panel-data" class="tab-panel" hidden>
@@ -72,6 +73,13 @@
               <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> data. The addresses you type (and your location,
               if you choose "My location") are sent to these services to plan the route. "Locate me" uses your browser's location
               and does not send it anywhere.
+            </li>
+            <li>
+              <a href="https://donnees.montreal.ca/dataset/collisions-routieres">Collisions routières</a>,
+              City of Montréal (police collision reports from the SAAQ), licensed under
+              <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Accessed November 28, 2026.
+              The file covers 2012 to 2021. I kept the 3,687 collisions from 2017 to 2021 where a bike was involved and
+              the location is accurate, and translated the severity into English.
             </li>
             <li>
               Basemap: <a href="https://www.arcgis.com/home/item.html?id=30e5fe3149c34df1ba922e6f5bbf808f">World Topographic Map</a>,
