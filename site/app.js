@@ -178,7 +178,7 @@ map.getPane('routePane').style.pointerEvents = 'none';
 const routeLayer = L.layerGroup().addTo(map);
 
 // My data for scoring routes; filled in once the GeoJSON files have loaded
-const routeData = { lanes: [], repairStations: [] };
+const routeData = { lanes: [], repairStations: [], collisions: null };   // collisions stay null if their file fails
 
 // Nominatim reads French street words best, so expand common English forms: "Blvd W" -> "boulevard Ouest"
 function tidyAddress(text) {
@@ -360,6 +360,19 @@ function scoreRoute(route) {
     return distanceToLine(toMetres(c[0], c[1]), line) <= 200;
   }).length;
 
+  // Bike collisions (2017–2021) within 25 m of the route. A quick box test first skips the many
+  // collisions nowhere near the route; only the rest get the exact distance check.
+  let collisions = null;   // stays null when the collision data did not load
+  if (routeData.collisions) {
+    const xs = line.map(function (p) { return p[0]; });
+    const ys = line.map(function (p) { return p[1]; });
+    const box = { minX: Math.min(...xs) - 25, maxX: Math.max(...xs) + 25, minY: Math.min(...ys) - 25, maxY: Math.max(...ys) + 25 };
+    collisions = routeData.collisions.filter(function (p) {
+      return p[0] >= box.minX && p[0] <= box.maxX && p[1] >= box.minY && p[1] <= box.maxY &&
+        distanceToLine(p, line) <= 25;
+    }).length;
+  }
+
   // Points readers added with memory.js: only problems and construction reports, within 50 m
   const readerPoints = (window.memory && window.memory.points) || [];
   const problems = readerPoints.filter(function (point) {
@@ -373,6 +386,7 @@ function scoreRoute(route) {
     yearRoundShare: points.length ? onYearRound / points.length : 0,
     poorPavementKm: onPoorPavement * CHECK_EVERY / 1000,
     repairStations: repairStations,
+    collisions: collisions,
     problems: problems
   };
 }
@@ -428,6 +442,11 @@ function showRoutes(start, end, routes) {
           Math.round(100 * s.yearRoundShare) + '% on lanes open year-round, ' +
           s.poorPavementKm.toFixed(1) + ' km on poor pavement, ' +
           s.repairStations + ' repair station' + (s.repairStations === 1 ? '' : 's') + ' within 200 m';
+        // Collisions as a count and per km, so a longer route is not unfairly penalised
+        if (s.collisions !== null) {
+          text += ', ' + s.collisions + ' bike collision' + (s.collisions === 1 ? '' : 's') + ' within 25 m (2017–2021), ' +
+            (s.collisions / (route.distance / 1000)).toFixed(1) + ' per km';
+        }
       }
       const button = document.createElement('button');
       button.type = 'button';
@@ -818,14 +837,24 @@ Promise.all([
   loadGeoJSON('../data/repair_stations.geojson').catch(function (err) {
     console.error(err);
     return null;
+  }),
+  // Bike collisions are optional too
+  loadGeoJSON('../data/bike_collisions.geojson').catch(function (err) {
+    console.error(err);
+    return null;
   })
 ])
-  .then(function ([data, pavementData, repairData]) {
+  .then(function ([data, pavementData, repairData, collisionData]) {
     loadingBox.remove();   // the data is here: take the loading message off the map
 
     // Give the route planner my bike lanes, pavement and repair stations for scoring
     routeData.lanes = buildLaneIndex(data.features, pavementData.features);
     routeData.repairStations = repairData ? repairData.features : [];
+    // Each collision's point in metres, worked out once so every route can be checked quickly
+    routeData.collisions = collisionData ? collisionData.features.map(function (feature) {
+      const c = feature.geometry.coordinates;
+      return toMetres(c[0], c[1]);
+    }) : null;
 
     const facilityTypeNames = {
       'Bande cyclable': 'Bike lane',
@@ -935,6 +964,39 @@ Promise.all([
       rememberMarks(map, repairLayer, { idField: '@id', nameField: 'label', title: 'My repair stations' });
     }
 
+    // Bike collisions, 2017–2021 (City of Montréal / SAAQ). Small dark grey dots, bigger and darker
+    // the more serious the collision. Off at the start; the reader turns it on in the layer box.
+    const COLLISION_STYLE = {
+      'Fatal': { radius: 7, fillColor: '#111111' },
+      'Serious injury': { radius: 6, fillColor: '#262626' },
+      'Minor injury': { radius: 4, fillColor: '#525252' },
+      'Property damage only': { radius: 3, fillColor: '#737373' }
+    };
+    function cyclistsHurt(p) {
+      const parts = [];
+      if (p.cyclists_killed) parts.push(p.cyclists_killed + (p.cyclists_killed === 1 ? ' cyclist' : ' cyclists') + ' killed');
+      if (p.cyclists_injured) parts.push(p.cyclists_injured + (p.cyclists_injured === 1 ? ' cyclist' : ' cyclists') + ' injured');
+      return parts.length ? parts.join(', ') : 'no cyclist hurt';
+    }
+    const collisionLayer = L.geoJSON(collisionData, {
+      pointToLayer: function (feature, latlng) {
+        const s = COLLISION_STYLE[feature.properties.severity] || COLLISION_STYLE['Property damage only'];
+        return L.circleMarker(latlng, {
+          radius: s.radius, fillColor: s.fillColor, fillOpacity: 0.85, color: '#ffffff', weight: 1
+        });
+      },
+      onEachFeature: function (feature, layer) {
+        const p = feature.properties;
+        layer.bindPopup(
+          '<strong>Collision involving a bike</strong><br>' +
+          'Date: ' + p.date + '<br>' +
+          'Severity: ' + p.severity + '<br>' +
+          'Cyclists: ' + cyclistsHurt(p) + '<br>' +
+          'Street: ' + (p.street || 'street not recorded')
+        );
+      }
+    });
+
     const overlays = {
       '<span class="layer-swatch separated"></span>Separated from cars': laneLayers.separated,
       '<span class="layer-swatch painted"></span>Painted lanes': laneLayers.painted,
@@ -943,6 +1005,9 @@ Promise.all([
     };
     if (repairData) {
       overlays['<span class="layer-swatch repair">' + WRENCH_SVG + '</span>Bike repair stations'] = repairLayer;
+    }
+    if (collisionData) {
+      overlays['<span class="layer-swatch collision"></span>Bike collisions (2017–2021)'] = collisionLayer;
     }
     // Collapse the layer list into an icon on phones so it doesn't cover the map
     const layerControl = L.control.layers(null, overlays, { collapsed: isPhone }).addTo(map);

@@ -225,6 +225,16 @@ a {
   height: 10px;
 }
 
+/* Bike collisions: a small dark grey dot, like the dots on the map */
+.layer-swatch.collision {
+  width: 9px;
+  height: 9px;
+  border: 1px solid white;
+  border-radius: 50%;
+  background: #525252;
+  box-shadow: 0 0 0 1px #9ca3af;
+}
+
 .layer-swatch.pavement {
   background: #fe9929;
 }
